@@ -53,6 +53,7 @@ class TaskQuestionnaireSerializer(serializers.ModelSerializer):
 
 class DecisionMakerTasksSerializer(serializers.ModelSerializer):
     tasks = TaskDetailSerializer(many=True, read_only=True)
+
     class Meta:
         model = DecisionMakers
-        fields = ('id' , 'login' , 'tasks')
+        fields = ('id', 'login', 'tasks')

@@ -92,6 +92,8 @@ class TaskCreateView(APIView):
 #         except DecisionMakers.DoesNotExist:
 #             return Response({'error': 'Пользователь не найден'}, status=404)
 
+
+#тут мы можем создать , получить , обработать таски и создать его
 class TaskDetailViewSet(viewsets.ModelViewSet):
     queryset = DecisionMakers.objects.all()
     serializer_class = DecisionMakerTasksSerializer
@@ -141,19 +143,7 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Пользователь не найден'}, status=404)
 
 
-# вывводим информацию для формирования опросника
-# class TaskQuestionnaireView(APIView):
-#     def post(self, request):
-#         task_id = request.data.get('task_id')
-#         dm_id = request.data.get('dm_id')
-#         try:
-#             des_mak = DecisionMakers.objects.get(id=dm_id)
-#             task = Tasks.objects.get(pk=task_id, decision_maker_id=des_mak)
-#             return Response(TaskQuestionnaireSerializer(task).data)
-#         except Tasks.DoesNotExist:
-#             return Response({'error': 'Невозможно получить данные о задании'}, status=404)
-
-
+# пролучаем настройки такска для конкретного пользователя
 class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
     queryset = Tasks.objects.all()
     serializer_class = TaskQuestionnaireSerializer

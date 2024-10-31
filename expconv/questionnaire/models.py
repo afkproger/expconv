@@ -13,7 +13,7 @@ class DecisionMakers(models.Model):
 class Tasks(models.Model):
     name = models.CharField(max_length=255, unique=True, db_index=True)
     description = models.TextField()
-    decision_maker = models.ForeignKey('DecisionMakers', on_delete=models.CASCADE)
+    decision_maker = models.ForeignKey('DecisionMakers', on_delete=models.CASCADE ,related_name='tasks')
 
     def __str__(self):
         return self.name

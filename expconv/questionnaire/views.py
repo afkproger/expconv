@@ -1,6 +1,9 @@
+from pickle import FALSE
+
 from django.forms import model_to_dict
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -77,27 +80,80 @@ class TaskCreateView(APIView):
 
 
 # вывести тут все созданные опросники
-class TaskDetailView(APIView):
-    def post(self, request):
-        dm_id = request.data.get('dm_id')
-        try:
-            tasks = Tasks.objects.filter(decision_maker=dm_id)
-            if not tasks.exists():
-                return Response({'error': 'Невозможно получить список задач для этого пользователя'}, status=404)
+# class TaskDetailView(APIView):
+#     def post(self, request):
+#         dm_id = request.data.get('dm_id')
+#         try:
+#             tasks = Tasks.objects.filter(decision_maker=dm_id)
+#             if not tasks.exists():
+#                 return Response({'error': 'Невозможно получить список задач для этого пользователя'}, status=404)
+#
+#             return Response(TaskDetailSerializer(tasks, many=True).data)
+#         except DecisionMakers.DoesNotExist:
+#             return Response({'error': 'Пользователь не найден'}, status=404)
 
-            return Response(TaskDetailSerializer(tasks, many=True).data)
+class TaskDetailViewSet(viewsets.ModelViewSet):
+    queryset = DecisionMakers.objects.all()
+    serializer_class = DecisionMakerTasksSerializer
+
+    @action(methods=['post'], detail=False)
+    def createtask(self, request):
+        dm_id = request.data.get('dm_id')
+        name = request.data.get('name')
+        description = request.data.get('description')
+        scale = request.data.get('scale')  # Получаем массив scale
+        values = request.data.get('values')  # Получаем массив values
+
+        try:
+            # Находим пользователя
+            dm = DecisionMakers.objects.get(pk=dm_id)
+
+            # Создаём задачу
+            task = Tasks.objects.create(name=name, description=description, decision_maker=dm)
+
+            # Обрабатываем значения из массива scale
+            for item in scale:
+                grade = item.get('grade')
+                weight = item.get('weight')
+
+                # Создаём связанные объекты Scale
+                Scale.objects.create(
+                    task=task,  # Связь с задачей
+                    grade=grade,
+                    weight=weight
+                )
+
+            # Обрабатываем значения из массива values
+            for value in values:
+                indicator = value.get('indicators')
+                question = value.get('question')
+
+                # Создаём связанные объекты Indicators
+                Indicators.objects.create(
+                    task=task,  # Связь с задачей
+                    indicator=indicator,
+                    question=question
+                )
+
+            return Response(TaskCreateSerializers(task).data)
+
         except DecisionMakers.DoesNotExist:
             return Response({'error': 'Пользователь не найден'}, status=404)
 
 
 # вывводим информацию для формирования опросника
-class TaskQuestionnaireView(APIView):
-    def post(self, request):
-        task_id = request.data.get('task_id')
-        dm_id = request.data.get('dm_id')
-        try:
-            des_mak = DecisionMakers.objects.get(id=dm_id)
-            task = Tasks.objects.get(pk=task_id, decision_maker_id=des_mak)
-            return Response(TaskQuestionnaireSerializer(task).data)
-        except Tasks.DoesNotExist:
-            return Response({'error': 'Невозможно получить данные о задании'}, status=404)
+# class TaskQuestionnaireView(APIView):
+#     def post(self, request):
+#         task_id = request.data.get('task_id')
+#         dm_id = request.data.get('dm_id')
+#         try:
+#             des_mak = DecisionMakers.objects.get(id=dm_id)
+#             task = Tasks.objects.get(pk=task_id, decision_maker_id=des_mak)
+#             return Response(TaskQuestionnaireSerializer(task).data)
+#         except Tasks.DoesNotExist:
+#             return Response({'error': 'Невозможно получить данные о задании'}, status=404)
+
+
+class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
+    queryset = Tasks.objects.all()
+    serializer_class = TaskQuestionnaireSerializer

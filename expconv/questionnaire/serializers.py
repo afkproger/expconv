@@ -24,7 +24,7 @@ class TaskCreateSerializers(serializers.ModelSerializer):
 class ScaleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scale
-        fields = ('id','grade', 'weight')
+        fields = ('id', 'grade', 'weight')
 
 
 class IndicatorSerializer(serializers.ModelSerializer):
@@ -48,4 +48,11 @@ class TaskQuestionnaireSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tasks
-        fields = ('description', 'scale', 'indicators')
+        fields = ('name', 'description', 'scale', 'indicators')
+
+
+class DecisionMakerTasksSerializer(serializers.ModelSerializer):
+    tasks = TaskDetailSerializer(many=True, read_only=True)
+    class Meta:
+        model = DecisionMakers
+        fields = ('id' , 'login' , 'tasks')

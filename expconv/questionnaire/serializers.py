@@ -1,18 +1,19 @@
 from rest_framework import serializers
-
-from questionnaire.models import DecisionMakers, Tasks, Indicators, Scale
-
-
-class DecisionMakersRegistrationSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = DecisionMakers
-        fields = ('id', 'fio', 'login', 'password')
+from djoser.serializers import UserSerializer as BaseUserSerializer
+from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
+from questionnaire.models import Tasks, Indicators, Scale, User
 
 
-class DecisionMakersSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = DecisionMakers
-        fields = ('id', 'login', 'fio')
+class UserCreateSerializer(BaseUserCreateSerializer):
+    class Meta(BaseUserCreateSerializer.Meta):
+        model = User
+        fields = ('id', 'username', 'password', 'fio')
+
+
+class UserSerializer(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        model = User
+        fields = ('id', 'username', 'fio')
 
 
 class TaskCreateSerializers(serializers.ModelSerializer):
@@ -34,26 +35,21 @@ class IndicatorSerializer(serializers.ModelSerializer):
 
 
 class TaskDetailSerializer(serializers.ModelSerializer):
-    # scale = ScaleSerializer(many=True, read_only=True)
-    # indicators = IndicatorSerializer(many=True, read_only=True)
-
     class Meta:
         model = Tasks
         fields = ('id', 'name', 'description')
 
 
-class TaskQuestionnaireSerializer(serializers.ModelSerializer):
-    scale = ScaleSerializer(many=True, read_only=True)
-    indicators = IndicatorSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Tasks
-        fields = ('name', 'description', 'scale', 'indicators')
-
-
-class DecisionMakerTasksSerializer(serializers.ModelSerializer):
+class UserQuestionnaireSerializer(serializers.ModelSerializer):
     tasks = TaskDetailSerializer(many=True, read_only=True)
 
     class Meta:
-        model = DecisionMakers
-        fields = ('id', 'login', 'tasks')
+        model = User
+        fields = ('tasks', 'username')
+
+class TaskQuestionnaireSerializer(serializers.ModelSerializer):
+    scale = ScaleSerializer(many=True , read_only=True)
+    indicators = IndicatorSerializer(many=True , read_only=True)
+    class Meta:
+        model = Tasks
+        fields = ()

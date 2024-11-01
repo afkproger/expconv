@@ -1,19 +1,17 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class DecisionMakers(models.Model):
+class User(AbstractUser):
     fio = models.CharField(max_length=255)
-    login = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=100)
-
     def __str__(self):
-        return self.fio
+        return self.username
 
 
 class Tasks(models.Model):
     name = models.CharField(max_length=255, unique=True, db_index=True)
     description = models.TextField()
-    decision_maker = models.ForeignKey('DecisionMakers', on_delete=models.CASCADE ,related_name='tasks')
+    user = models.ForeignKey('User', on_delete=models.CASCADE ,related_name='tasks')
 
     def __str__(self):
         return self.name

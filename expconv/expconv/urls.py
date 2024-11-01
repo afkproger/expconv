@@ -15,17 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from questionnaire.views import *
 from rest_framework import routers
 
 router = routers.SimpleRouter()
-router.register(f'tasks', TaskDetailViewSet)
-router.register(f'questionnaire', TaskQuestionnaireViewSet)
+# router.register(f'tasks', TaskDetailViewSet)
+# router.register(f'questionnaire', TaskQuestionnaireViewSet)
 
 urlpatterns = [
-    path('api/v1/registrations/', DecisionMakersRegistration.as_view(), name='registrations'),
-    path('api/v1/login/', DecisionMakersViews.as_view(), name='login'),
-    path('api/v1/createtask/', TaskCreateView.as_view(), name='create_task'),
-    path('api/v1/', include(router.urls)),
+    # path('api/v1/', include(router.urls)),
+    path('api/v1/auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

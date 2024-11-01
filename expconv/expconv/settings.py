@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -27,7 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,9 +35,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'questionnaire.apps.QuestionnaireConfig' ,
+    'questionnaire.apps.QuestionnaireConfig',
+    'djoser',
     'rest_framework',
+    'rest_framework.authtoken'
 ]
+
+AUTH_USER_MODEL = 'questionnaire.User'
+
+DJOSER = {
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'LOGIN_FIELD': 'username',
+    'SERIALIZERS': {
+        'user_create': 'questionnaire.serializers.UserCreateSerializer',
+        'user': 'questionnaire.serializers.UserSerializer',
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'expconv.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -79,10 +89,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'expconv',  # Имя вашей базы данных
-        'USER': 'postgres',       # Ваш пользователь
-        'PASSWORD': '1234',  # Пароль пользователя
-        'HOST': 'localhost',    # Адрес базы данных (localhost, если база на локальной машине)
-        'PORT': '5432',         # Порт для PostgreSQL (по умолчанию 5432)
+        'USER': 'postgres',  # Ваш пользователь
+        'PASSWORD': '12345',  # Пароль пользователя
+        'HOST': 'localhost',  # Адрес базы данных (localhost, если база на локальной машине)
+        'PORT': '5432',  # Порт для PostgreSQL (по умолчанию 5432)
     }
 }
 
@@ -104,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -116,7 +125,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -126,3 +134,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}

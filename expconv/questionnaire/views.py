@@ -61,10 +61,10 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Пользователь не найден'}, status=404)
 
 
-# пролучаем настройки такска для конкретного пользователя
-# class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserQuestionnaireSerializer
+# пролучаем настройки такска для конкретного пользователя(в самом базовом варианте написаны)
+class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserQuestionnaireSerializer
 
 
 class Test(APIView):

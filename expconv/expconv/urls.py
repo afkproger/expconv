@@ -21,7 +21,7 @@ from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(f'tasks', TaskDetailViewSet)
-# router.register(f'questionnaire', TaskQuestionnaireViewSet)
+router.register(f'questionnaire', TaskQuestionnaireViewSet)
 
 urlpatterns = [
     path('api/v1/', include(router.urls)),

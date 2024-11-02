@@ -3,15 +3,17 @@ from django.db import models
 
 
 class User(AbstractUser):
-    fio = models.CharField(max_length=255)
+    tel = models.CharField(max_length=15, blank=True, null=True)
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'tel']
+
     def __str__(self):
         return self.username
 
 
 class Tasks(models.Model):
-    name = models.CharField(max_length=255, unique=True, db_index=True)
+    name = models.CharField(max_length=255, db_index=True)
     description = models.TextField()
-    user = models.ForeignKey('User', on_delete=models.CASCADE ,related_name='tasks')
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='tasks')
 
     def __str__(self):
         return self.name

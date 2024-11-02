@@ -20,11 +20,12 @@ from questionnaire.views import *
 from rest_framework import routers
 
 router = routers.SimpleRouter()
-# router.register(f'tasks', TaskDetailViewSet)
+router.register(f'tasks', TaskDetailViewSet)
 # router.register(f'questionnaire', TaskQuestionnaireViewSet)
 
 urlpatterns = [
-    # path('api/v1/', include(router.urls)),
+    path('api/v1/', include(router.urls)),
+    path('api/v1/test/', Test.as_view()),
     path('api/v1/auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

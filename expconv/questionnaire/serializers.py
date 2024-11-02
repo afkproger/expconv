@@ -7,19 +7,13 @@ from questionnaire.models import Tasks, Indicators, Scale, User
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
         model = User
-        fields = ('id', 'username', 'password', 'fio')
+        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'tel')
 
 
 class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = User
-        fields = ('id', 'username', 'fio')
-
-
-class TaskCreateSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Tasks
-        fields = ('id', 'name')
+        fields = ('username', 'first_name', 'last_name', 'tel')
 
 
 class ScaleSerializer(serializers.ModelSerializer):
@@ -34,10 +28,19 @@ class IndicatorSerializer(serializers.ModelSerializer):
         fields = ('indicator', 'question')
 
 
-class TaskDetailSerializer(serializers.ModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
-        fields = ('id', 'name', 'description')
+        fields = ('name', 'description')
+
+
+class TaskDetailSerializer(serializers.ModelSerializer):
+    scale = ScaleSerializer(many=True, read_only=True)
+    indicators = IndicatorSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Tasks
+        fields = ('id', 'name', 'description', 'scale', 'indicators')
 
 
 class UserQuestionnaireSerializer(serializers.ModelSerializer):
@@ -45,11 +48,4 @@ class UserQuestionnaireSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('tasks', 'username')
-
-class TaskQuestionnaireSerializer(serializers.ModelSerializer):
-    scale = ScaleSerializer(many=True , read_only=True)
-    indicators = IndicatorSerializer(many=True , read_only=True)
-    class Meta:
-        model = Tasks
-        fields = ()
+        fields = ('tasks', 'username', 'tel')

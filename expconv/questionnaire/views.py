@@ -6,19 +6,20 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from questionnaire.models import  Tasks, Indicators
+from rest_framework.permissions import IsAuthenticated
+from questionnaire.models import Tasks, Indicators
 from questionnaire.serializers import *
 
 
-#тут мы можем создать , получить , обработать таски и создать его
+# тут мы можем создать , получить , обработать таски и создать его
 class TaskDetailViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    queryset = Tasks.objects.all()
+    serializer_class = TaskDetailSerializer
+    permission_classes = (IsAuthenticated,)
 
     @action(methods=['post'], detail=False)
     def createtask(self, request):
-        dm_id = request.data.get('dm_id')
+        user = request.user
         name = request.data.get('name')
         description = request.data.get('description')
         scale = request.data.get('scale')  # Получаем массив scale
@@ -26,10 +27,9 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
 
         try:
             # Находим пользователя
-            dm = DecisionMakers.objects.get(pk=dm_id)
 
             # Создаём задачу
-            task = Tasks.objects.create(name=name, description=description, decision_maker=dm)
+            task = Tasks.objects.create(name=name, description=description, user=user)
 
             # Обрабатываем значения из массива scale
             for item in scale:
@@ -55,13 +55,19 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
                     question=question
                 )
 
-            return Response(TaskCreateSerializers(task).data)
+            return Response(TaskSerializer(task).data)
 
-        except DecisionMakers.DoesNotExist:
+        except User.DoesNotExist:
             return Response({'error': 'Пользователь не найден'}, status=404)
 
 
 # пролучаем настройки такска для конкретного пользователя
-class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
-    queryset = Tasks.objects.all()
-    serializer_class = TaskQuestionnaireSerializer
+# class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserQuestionnaireSerializer
+
+
+class Test(APIView):
+    def post(self, request):
+        user = request.user
+        return Response(UserSerializer(user).data)

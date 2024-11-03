@@ -20,8 +20,8 @@ from questionnaire.views import *
 from rest_framework import routers
 
 router = routers.SimpleRouter()
-router.register(f'tasks', TaskDetailViewSet)
-router.register(f'questionnaire', TaskQuestionnaireViewSet)
+router.register(f'tasks', TaskDetailViewSet, basename='tasks')
+router.register(f'questionnaire', TaskQuestionnaireViewSet, basename='questionnaire')
 
 urlpatterns = [
     path('api/v1/', include(router.urls)),

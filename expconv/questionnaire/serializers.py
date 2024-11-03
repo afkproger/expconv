@@ -31,7 +31,7 @@ class IndicatorSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
-        fields = ('name', 'description')
+        fields = ('id', 'name', 'description')
 
 
 class TaskDetailSerializer(serializers.ModelSerializer):
@@ -41,6 +41,14 @@ class TaskDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = ('id', 'name', 'description', 'scale', 'indicators')
+
+
+class UserTaskSerializer(serializers.ModelSerializer):
+    tasks = TaskSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'tasks')
 
 
 class UserQuestionnaireSerializer(serializers.ModelSerializer):

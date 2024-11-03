@@ -13,9 +13,11 @@ from questionnaire.serializers import *
 
 # тут мы можем создать , получить , обработать таски и создать его
 class TaskDetailViewSet(viewsets.ModelViewSet):
-    queryset = Tasks.objects.all()
-    serializer_class = TaskDetailSerializer
-    permission_classes = (IsAuthenticated,)
+    serializer_class = UserTaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
 
     @action(methods=['post'], detail=False)
     def createtask(self, request):
@@ -63,8 +65,11 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
 
 # пролучаем настройки такска для конкретного пользователя(в самом базовом варианте написаны)
 class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     serializer_class = UserQuestionnaireSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
 
 
 class Test(APIView):

@@ -4,6 +4,7 @@ from django.forms import model_to_dict
 from django.shortcuts import render
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -63,13 +64,33 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Пользователь не найден'}, status=404)
 
 
-# пролучаем настройки такска для конкретного пользователя(в самом базовом варианте написаны)
+# пролучаем настройки таска для конкретного пользователя
 class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
-    serializer_class = UserQuestionnaireSerializer
+    serializer_class = TaskDetailSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return User.objects.filter(id=self.request.user.id)
+        # Возвращаем пустой QuerySet, если pk не указан
+        task_id = self.kwargs.get('pk')
+        if task_id is None:
+            return Tasks.objects.none()  # Пустой QuerySet
+
+        # Если pk указан, возвращаем только задачи текущего пользователя
+        return Tasks.objects.filter(user=self.request.user)
+
+    def get_object(self):
+        # Пытаемся найти задачу по `id`
+        task_id = self.kwargs.get('pk')
+
+        if task_id is None:
+            raise NotFound({'error': 'Не указан id задачи'})
+
+        try:
+            task = self.get_queryset().get(id=task_id)
+        except Tasks.DoesNotExist:
+            raise NotFound({'error': 'Задача не найдена'})
+
+        return task
 
 
 class Test(APIView):

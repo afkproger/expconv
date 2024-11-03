@@ -51,9 +51,10 @@ class UserTaskSerializer(serializers.ModelSerializer):
         fields = ('username', 'tasks')
 
 
-class UserQuestionnaireSerializer(serializers.ModelSerializer):
-    tasks = TaskDetailSerializer(many=True, read_only=True)
+# class UserQuestionnaireSerializer(serializers.ModelSerializer):
+#     tasks = TaskDetailSerializer(many=True, read_only=True)
+#
+#     class Meta:
+#         model = User
+#         fields = ('tasks', 'username', 'tel')
 
-    class Meta:
-        model = User
-        fields = ('tasks', 'username', 'tel')

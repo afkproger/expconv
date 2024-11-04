@@ -1,64 +1,64 @@
 <template>
-    <div class="login-container">
-      <h1>Вход</h1>
-      <form @submit.prevent="loginUser">
-        <label for="username">Имя пользователя:</label>
-        <input v-model="loginData.username" type="text" id="username" required />
-  
-        <label for="password">Пароль:</label>
-        <input v-model="loginData.password" type="password" id="password" required />
-  
-        <button type="submit">Войти</button>
-      </form>
-  
-      <p v-if="loginMessage">{{ loginMessage }}</p>
-  
-      <p>
-        Нет аккаунта? 
-        <router-link to="/register">Зарегистрируйтесь</router-link>
-      </p>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        loginData: {
-          username: '',
-          password: ''
-        },
-        loginMessage: ''
-      };
-    },
-    methods: {
-      async loginUser() {
-        try {
-          const response = await fetch('http://127.0.0.1:8000/api/v1/auth/login/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.loginData)
-          });
-  
-          if (response.ok) {
-            const result = await response.json();
-            this.loginMessage = 'Успешный вход!';
-            console.log('Success:', result);
-            // Здесь вы можете сохранить токен или информацию о пользователе
-          } else {
-            const error = await response.json();
-            this.loginMessage = `Ошибка: ${error.detail || 'Проверьте введенные данные.'}`;
-          }
-        } catch (error) {
-          console.error('Ошибка при отправке запроса:', error);
-          this.loginMessage = 'Произошла ошибка при соединении с сервером.';
+  <div class="login-container">
+    <h1>Вход</h1>
+    <form @submit.prevent="loginUser">
+      <label for="username">Имя пользователя:</label>
+      <input v-model="loginData.username" type="text" id="username" required />
+
+      <label for="password">Пароль:</label>
+      <input v-model="loginData.password" type="password" id="password" required />
+
+      <button type="submit">Войти</button>
+    </form>
+
+    <p v-if="loginMessage">{{ loginMessage }}</p>
+
+    <p>
+      Нет аккаунта? 
+      <router-link to="/register">Зарегистрируйтесь</router-link>
+    </p>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      loginData: {
+        username: this.$route.query.username || '',  // Получаем username из query
+        password: this.$route.query.password || ''   // Получаем password из query
+      },
+      loginMessage: ''
+    };
+  },
+  methods: {
+    async loginUser() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/auth/login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.loginData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          this.loginMessage = 'Успешный вход!';
+          console.log('Success:', result);
+          // Здесь можно сохранить токен или перенаправить пользователя
+        } else {
+          const error = await response.json();
+          this.loginMessage = `Ошибка: ${error.detail || 'Проверьте введенные данные.'}`;
         }
+      } catch (error) {
+        console.error('Ошибка при отправке запроса:', error);
+        this.loginMessage = 'Произошла ошибка при соединении с сервером.';
       }
     }
-  };
-  </script>
+  }
+};
+</script>
   
   <style scoped>
 .login-container {

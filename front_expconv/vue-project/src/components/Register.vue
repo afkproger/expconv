@@ -61,6 +61,12 @@ export default {
           const result = await response.json();
           this.responseMessage = 'Регистрация прошла успешно!';
           console.log('Success:', result);
+
+          // Перенаправляем на страницу Login.vue с переданными данными
+          this.$router.push({
+            path: '/',
+            query: { username: this.formData.username, password: this.formData.password }
+          });
         } else {
           const error = await response.json();
           this.responseMessage = `Ошибка: ${error.detail || 'Проверьте введенные данные.'}`;

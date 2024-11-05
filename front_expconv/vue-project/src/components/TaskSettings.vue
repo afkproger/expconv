@@ -1,6 +1,7 @@
 <template>
   <div>
-    <header>
+    <header class="header-with-logo">
+      <img src="@/assets/fic_ran.png" alt="Логотип" class="logo" />
       <span class="username-container" @click="fetchUserInfo">
         {{ userInfo.username || 'Профиль' }}
       </span>
@@ -191,6 +192,19 @@ textarea {
   position: relative;
 }
 
+.header-with-logo {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.logo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
+}
 .close {
   position: absolute;
   top: 10px;

@@ -1,6 +1,7 @@
 <template>
   <div>
-    <header>
+    <header class = "header-with-logo">
+      <img src="@/assets/fic_ran.png" alt="Логотип" class="logo" />
       <span class="username-container" @click="fetchUserInfo">
         {{ username || 'Профиль' }}
       </span>
@@ -36,6 +37,7 @@
         <p><strong>Фамилия:</strong> {{ userInfo.last_name }}</p>
         <p><strong>Телефон:</strong> {{ userInfo.tel }}</p>
         <p><strong>Email:</strong> {{ userInfo.email }}</p>
+        <button @click="logoutUser" class="logout-button">Выход</button>
       </div>
     </div>
 
@@ -119,6 +121,35 @@ export default {
       } catch (error) {
         console.error('Ошибка при отправке запроса:', error);
       }
+    },
+
+    async logoutUser() {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        console.warn('Токен отсутствует.');
+        return;
+      }
+
+      const response = await fetch('http://127.0.0.1:8000/auth/token/logout/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        }
+      });
+
+      if (response.ok) {
+        localStorage.removeItem('auth_token');
+        this.username = '';
+        this.showUserModal = false;
+        window.location.href = 'http://localhost:8080/';
+      } else {
+        console.error('Ошибка при выходе из системы:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Ошибка при отправке запроса на выход:', error);
+    }
     },
     async goToQuestionnaire(taskId) {
         this.$router.push({ name: 'Questionnaire', params: { id: taskId } });
@@ -208,6 +239,19 @@ export default {
     margin-right: 20px;
     font-weight: bold;
   }
+  .header-with-logo {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+  }
   
   .settings-button {
     margin: 20px 0;
@@ -218,6 +262,20 @@ export default {
     border-radius: 5px;
     cursor: pointer;
   }
+
+  .logout-button {
+  margin-top: 20px;
+  padding: 10px 15px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #d32f2f;
+}
   
   .settings-button:hover {
     background-color: #45a049;

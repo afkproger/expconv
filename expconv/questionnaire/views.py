@@ -1,19 +1,20 @@
 from pickle import FALSE
-
 from django.forms import model_to_dict
 from django.shortcuts import render
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+
+from questionnaire.conv.EffectivenessCalculator_class import EffectivenessCalculator
 from questionnaire.models import Tasks, Indicators
 from questionnaire.serializers import *
 
 
 # тут мы можем создать , получить , обработать таски и создать его
-#стоит изменить values на indicators
+# стоит изменить values на indicators
 class TaskDetailViewSet(viewsets.ModelViewSet):
     serializer_class = UserTaskSerializer
     permission_classes = [IsAuthenticated]
@@ -100,3 +101,35 @@ class ShowUserInfo(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class CalculateConvolution(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            answers = request.data.get('answers', [])
+            survey_results = {}
+
+            for answer in answers:
+                index = answer.get('index')
+                weight = answer.get('weight')
+
+                if index is not None and weight is not None:
+                    survey_results[index] = weight
+            calculate = EffectivenessCalculator(survey_results)
+            parameters_list = calculate.get_parameters_list()
+            fn_labels = calculate.get_fn_labels()
+            str_result = f"jрез = {EffectivenessCalculator.form_polynomial(parameters_list, fn_labels)}"
+
+            return Response({'conv': str_result})
+
+        except Exception as ex:
+            return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+    # survey_results = {0: 0.2, 1: 0.6, 2: 0.4}
+    # calculate = EffectivenessCalculator(survey_results)
+    # parameters_list = calculate.get_parameters_list()
+    # fn_labels = calculate.get_fn_labels()
+    # print(f"jрез = {EffectivenessCalculator.form_polynomial(parameters_list, fn_labels)}")
+    # calculate_effectiveness(parameters_list)

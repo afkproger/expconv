@@ -93,7 +93,9 @@ class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
         return task
 
 
-class Test(APIView):
-    def post(self, request):
-        user = request.user
-        return Response(UserSerializer(user).data)
+class ShowUserInfo(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

@@ -32,31 +32,41 @@ export default {
     };
   },
   methods: {
-    async loginUser() {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/auth/login/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(this.loginData)
-        });
+  async loginUser() {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/auth/token/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.loginData)
+      });
 
-        if (response.ok) {
-          const result = await response.json();
-          this.loginMessage = 'Успешный вход!';
-          console.log('Success:', result);
-          // Здесь можно сохранить токен или перенаправить пользователя
+      if (response.ok) {
+        const result = await response.json();
+        this.loginMessage = 'Успешный вход!';
+        console.log('Success:', result);
+
+        // Сохранение токена в localStorage
+        if (result.auth_token) {
+          localStorage.setItem('auth_token', result.auth_token);
+          localStorage.setItem('username' , this.loginData.username)
+
+          // Перенаправление на страницу с задачами
+          this.$router.push('/tasks');
         } else {
-          const error = await response.json();
-          this.loginMessage = `Ошибка: ${error.detail || 'Проверьте введенные данные.'}`;
+          console.warn('Токен не получен');
         }
-      } catch (error) {
-        console.error('Ошибка при отправке запроса:', error);
-        this.loginMessage = 'Произошла ошибка при соединении с сервером.';
+      } else {
+        const error = await response.json();
+        this.loginMessage = `Ошибка: ${error.detail || 'Проверьте введенные данные.'}`;
       }
+    } catch (error) {
+      console.error('Ошибка при отправке запроса:', error);
+      this.loginMessage = 'Произошла ошибка при соединении с сервером.';
     }
   }
+}
 };
 </script>
   

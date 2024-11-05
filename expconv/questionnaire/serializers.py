@@ -7,13 +7,13 @@ from questionnaire.models import Tasks, Indicators, Scale, User
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
         model = User
-        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'tel')
+        fields = ('id', 'username', 'password', 'first_name', 'email', 'last_name', 'tel')
 
 
 class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = User
-        fields = ('username', 'first_name', 'last_name', 'tel')
+        fields = ('username', 'first_name', 'last_name', 'tel', 'email')
 
 
 class ScaleSerializer(serializers.ModelSerializer):
@@ -49,12 +49,3 @@ class UserTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'tasks')
-
-
-# class UserQuestionnaireSerializer(serializers.ModelSerializer):
-#     tasks = TaskDetailSerializer(many=True, read_only=True)
-#
-#     class Meta:
-#         model = User
-#         fields = ('tasks', 'username', 'tel')
-

@@ -112,9 +112,28 @@ export default {
     removeValueItem(index) {
       this.task.values.splice(index, 1);
     },
-    submitTask() {
-      this.$emit('save-task', this.task);
-    },
+    async submitTask(){
+      try{
+        const token = localStorage.getItem('auth_token');
+        const respone = await fetch('http://127.0.0.1:8000/api/v1/tasks/createtask/',{
+          method: 'POST',
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          } ,
+          body: JSON.stringify(this.task)
+        });
+
+        if (respone.ok){
+          console.log('Задача сохранена');
+          this.$router.push('/tasks');
+        } else {
+          console.error('Ошибка сохранения: ' , respone.statusText);
+        }
+        } catch (error){
+          console.log('Ошибка при отправке запроса:' , error)
+        }
+      },
     goToTasks() {
       this.$router.push('/tasks'); 
     },

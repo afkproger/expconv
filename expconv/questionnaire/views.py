@@ -13,6 +13,7 @@ from questionnaire.serializers import *
 
 
 # тут мы можем создать , получить , обработать таски и создать его
+#стоит изменить values на indicators
 class TaskDetailViewSet(viewsets.ModelViewSet):
     serializer_class = UserTaskSerializer
     permission_classes = [IsAuthenticated]

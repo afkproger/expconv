@@ -1,120 +1,141 @@
 <template>
-    <div>
-      <header>
-        <span class="username-container" @click="fetchUserInfo">
-          {{ username || 'Профиль' }}
-        </span>
-      </header>
-  
-      <h1>Опросники пользователя</h1>
-  
-      <!-- Кнопка для перехода к настройкам задачи -->
-      <button @click="goToTaskSettings" class="settings-button">
-        Создать новый опросник
-      </button>
-  
-      <!-- Список задач -->
-      <div v-if="tasks.length" class="tasks-list">
-        <ul>
-          <li v-for="task in tasks" :key="task.id">
-            <h3>{{ task.name }}</h3>
-            <p>{{ task.description }}</p>
-          </li>
-        </ul>
-      </div>
-      <div v-else>
-        <p>Задачи не найдены.</p>
-      </div>
-  
-      <!-- Модальное окно для отображения информации о пользователе -->
-      <div v-if="showUserModal" class="modal">
-        <div class="modal-content">
-          <span @click="showUserModal = false" class="close">&times;</span>
-          <h2>Профиль пользователя</h2>
-          <p><strong>Имя пользователя:</strong> {{ userInfo.username }}</p>
-          <p><strong>Имя:</strong> {{ userInfo.first_name }}</p>
-          <p><strong>Фамилия:</strong> {{ userInfo.last_name }}</p>
-          <p><strong>Телефон:</strong> {{ userInfo.tel }}</p>
-          <p><strong>Email:</strong> {{ userInfo.email }}</p>
-        </div>
+  <div>
+    <header>
+      <span class="username-container" @click="fetchUserInfo">
+        {{ username || 'Профиль' }}
+      </span>
+    </header>
+
+    <h1>Опросники пользователя</h1>
+
+    <!-- Кнопка для перехода к настройкам задачи -->
+    <button @click="goToTaskSettings" class="settings-button">
+      Создать новый опросник
+    </button>
+
+    <!-- Список задач -->
+    <div v-if="tasks.length" class="tasks-list">
+      <ul>
+        <li v-for="task in tasks" :key="task.id">
+          <h3>{{ task.name }}</h3>
+          <p>{{ task.description }}</p>
+
+          <!-- Кнопки для действий с задачей -->
+          <button @click="viewTaskSettings(task.id)" class="action-button">Посмотреть настройки задачи</button>
+        </li>
+      </ul>
+    </div>
+    <div v-else>
+      <p>Задачи не найдены.</p>
+    </div>
+
+    <!-- Модальное окно для отображения информации о пользователе -->
+    <div v-if="showUserModal" class="modal">
+      <div class="modal-content">
+        <span @click="showUserModal = false" class="close">&times;</span>
+        <h2>Профиль пользователя</h2>
+        <p><strong>Имя пользователя:</strong> {{ userInfo.username }}</p>
+        <p><strong>Имя:</strong> {{ userInfo.first_name }}</p>
+        <p><strong>Фамилия:</strong> {{ userInfo.last_name }}</p>
+        <p><strong>Телефон:</strong> {{ userInfo.tel }}</p>
+        <p><strong>Email:</strong> {{ userInfo.email }}</p>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        username: '',
-        tasks: [],
-        showUserModal: false,
-        userInfo: {}
-      };
-    },
-    async mounted() {
-      this.username = localStorage.getItem('username') || '';
-      await this.fetchTasks();
-    },
-    methods: {
-      async fetchTasks() {
-        try {
-          const token = localStorage.getItem('auth_token');
-          if (!token) {
-            console.warn('Токен отсутствует. Пожалуйста, войдите в систему.');
-            return;
-          }
-  
-          const response = await fetch('http://127.0.0.1:8000/api/v1/tasks/', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Token ${token}`
-            }
-          });
-  
-          if (response.ok) {
-            const data = await response.json();
-            if (data.length && data[0].tasks) {
-              this.tasks = data[0].tasks;
-            } else {
-              console.warn('Формат данных отличается от ожидаемого.');
-            }
-          } else {
-            console.error('Ошибка при получении задач:', response.statusText);
-          }
-        } catch (error) {
-          console.error('Ошибка при отправке запроса:', error);
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      username: '',
+      tasks: [],
+      showUserModal: false,
+      userInfo: {}
+    };
+  },
+  async mounted() {
+    this.username = localStorage.getItem('username') || '';
+    await this.fetchTasks();
+  },
+  methods: {
+    async fetchTasks() {
+      try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          console.warn('Токен отсутствует. Пожалуйста, войдите в систему.');
+          return;
         }
-      },
-      async fetchUserInfo() {
-        try {
-          const token = localStorage.getItem('auth_token');
-          const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Token ${token}`
-            }
-          });
-  
-          if (response.ok) {
-            this.userInfo = await response.json();
-            this.showUserModal = true;
-          } else {
-            console.error('Ошибка при получении информации о пользователе:', response.statusText);
+
+        const response = await fetch('http://127.0.0.1:8000/api/v1/tasks/', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
           }
-        } catch (error) {
-          console.error('Ошибка при отправке запроса:', error);
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length && data[0].tasks) {
+            this.tasks = data[0].tasks;
+          } else {
+            console.warn('Формат данных отличается от ожидаемого.');
+          }
+        } else {
+          console.error('Ошибка при получении задач:', response.statusText);
         }
-      },
-      goToTaskSettings() {
-        this.$router.push({ name: 'TaskSettings' });
+      } catch (error) {
+        console.error('Ошибка при отправке запроса:', error);
       }
+    },
+    async fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          }
+        });
+
+        if (response.ok) {
+          this.userInfo = await response.json();
+          this.showUserModal = true;
+        } else {
+          console.error('Ошибка при получении информации о пользователе:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Ошибка при отправке запроса:', error);
+      }
+    },
+    goToTaskSettings() {
+      this.$router.push({ name: 'TaskSettings' });
+    },
+    viewTaskSettings(taskId) {
+      // Переход к настройкам задачи, используя taskId
+      this.$router.push({ name: 'TaskSettings', params: { id: taskId } });
     }
-  };
-  </script>
+  }
+};
+</script>
   
   <style scoped>
+
+.action-button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.action-button:hover {
+  background-color: #1e88e5;
+}
   header {
     display: flex;
     align-items: center;

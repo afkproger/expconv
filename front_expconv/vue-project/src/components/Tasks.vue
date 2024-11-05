@@ -8,20 +8,18 @@
 
     <h1>Опросники пользователя</h1>
 
-    <!-- Кнопка для перехода к настройкам задачи -->
     <button @click="goToTaskSettings" class="settings-button">
       Создать новый опросник
     </button>
 
-    <!-- Список задач -->
     <div v-if="tasks.length" class="tasks-list">
       <ul>
         <li v-for="task in tasks" :key="task.id">
           <h3>{{ task.name }}</h3>
           <p>{{ task.description }}</p>
-
-          <!-- Кнопки для действий с задачей -->
-          <button @click="viewTaskSettings(task.id)" class="action-button">Посмотреть настройки задачи</button>
+          <button @click="fetchTaskDetails(task.id)" class="action-button">Посмотреть настройки задачи</button>
+          <!-- Кнопка для перехода к опросу -->
+          <button @click="goToQuestionnaire(task.id)" class="action-button">Опрос</button>
         </li>
       </ul>
     </div>
@@ -29,7 +27,6 @@
       <p>Задачи не найдены.</p>
     </div>
 
-    <!-- Модальное окно для отображения информации о пользователе -->
     <div v-if="showUserModal" class="modal">
       <div class="modal-content">
         <span @click="showUserModal = false" class="close">&times;</span>
@@ -39,6 +36,38 @@
         <p><strong>Фамилия:</strong> {{ userInfo.last_name }}</p>
         <p><strong>Телефон:</strong> {{ userInfo.tel }}</p>
         <p><strong>Email:</strong> {{ userInfo.email }}</p>
+      </div>
+    </div>
+
+    <div v-if="showTaskModal" class="modal">
+      <div class="modal-content">
+        <span @click="showTaskModal = false" class="close">&times;</span>
+        <h2>Настройки задачи</h2>
+        <p><strong>Название:</strong> {{ taskDetails.name }}</p>
+        <p><strong>Описание:</strong> {{ taskDetails.description }}</p>
+
+        <h3>Шкала:</h3>
+        <table class="scale-table">
+            <thead>
+              <tr>
+                <th class="fixed-width">Лингвистическая шкала</th>
+                <th>Вес</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="scale in taskDetails.scale" :key="scale.id">
+                <td class="fixed-width">{{ scale.grade }}</td>
+                <td>{{ scale.weight }}</td>
+              </tr>
+            </tbody>
+        </table>
+
+        <h3>Индикаторы:</h3>
+        <ul>
+          <li v-for="indicator in taskDetails.indicators" :key="indicator.indicator">
+            {{ indicator.indicator }} — {{ indicator.question }}
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -51,7 +80,9 @@ export default {
       username: '',
       tasks: [],
       showUserModal: false,
-      userInfo: {}
+      showTaskModal: false,
+      userInfo: {},
+      taskDetails: {}
     };
   },
   async mounted() {
@@ -89,6 +120,9 @@ export default {
         console.error('Ошибка при отправке запроса:', error);
       }
     },
+    async goToQuestionnaire(taskId) {
+        this.$router.push({ name: 'Questionnaire', params: { id: taskId } });
+    },
     async fetchUserInfo() {
       try {
         const token = localStorage.getItem('auth_token');
@@ -113,9 +147,26 @@ export default {
     goToTaskSettings() {
       this.$router.push({ name: 'TaskSettings' });
     },
-    viewTaskSettings(taskId) {
-      // Переход к настройкам задачи, используя taskId
-      this.$router.push({ name: 'TaskSettings', params: { id: taskId } });
+    async fetchTaskDetails(taskId) {
+      try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch(`http://127.0.0.1:8000/api/v1/questionnaire/${taskId}/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          }
+        });
+
+        if (response.ok) {
+          this.taskDetails = await response.json();
+          this.showTaskModal = true;
+        } else {
+          console.error('Ошибка при получении настроек задачи:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Ошибка при отправке запроса:', error);
+      }
     }
   }
 };
@@ -125,12 +176,17 @@ export default {
 
 .action-button {
   margin-top: 10px;
+  margin-right: 10px; 
   padding: 8px 12px;
   background-color: #2196F3;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.action-button:last-child {
+  margin-right: 0; 
 }
 
 .action-button:hover {
@@ -169,7 +225,7 @@ export default {
   
   .tasks-list ul {
     padding-left: 0;
-    list-style-type: none; /* Убираем маркеры списка */
+    list-style-type: none; 
     margin: 0;
   }
   
@@ -196,7 +252,7 @@ export default {
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
-    width: 300px;
+    width: 500px;
     position: relative;
   }
   
@@ -214,5 +270,33 @@ export default {
   .close:hover {
     color: darkred;
   }
+
+  .scale-table {
+  width: 100%;              
+  border-collapse: collapse; 
+  margin-top: 10px;
+}
+
+.scale-table th,
+.scale-table td {
+  padding: 10px;               
+  border: 1px solid #ddd;      
+  text-align: center;          
+}
+
+.scale-table th {
+  background-color: #f5f5f5;   
+  font-weight: bold;           
+}
+
+.scale-table tr:nth-child(even) {
+  background-color: #f9f9f9;   
+}
+
+.scale-table .fixed-width {
+  width: 200px; /* Установите нужную ширину */
+  text-align: left; /* Выравнивание текста по левому краю для первой колонки */
+}
+
   </style>
   

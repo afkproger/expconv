@@ -20,7 +20,8 @@
           <p>{{ task.description }}</p>
           <button @click="fetchTaskDetails(task.id)" class="action-button">Посмотреть настройки задачи</button>
           <!-- Кнопка для перехода к опросу -->
-          <button @click="goToQuestionnaire(task.id)" class="action-button">Опрос</button>
+          <button @click="goToUserConvolution(task.id)" class="action-button">Рассчитать свёртку</button>
+          <button @click="goToQuestionnaire(task.id)" class="action-button">Отправить опрос экспертам</button>
         </li>
       </ul>
     </div>
@@ -151,8 +152,11 @@ export default {
       console.error('Ошибка при отправке запроса на выход:', error);
     }
     },
-    async goToQuestionnaire(taskId) {
-        this.$router.push({ name: 'Questionnaire', params: { id: taskId } });
+    async goToUserConvolution(taskId) {
+        this.$router.push({ name: 'UserConvolution', params: { id: taskId } });
+    },
+    async goToQuestionnaire(taskId){
+      this.$router.push({name:'Questionnaire' , params: {id : taskId}})
     },
     async fetchUserInfo() {
       try {

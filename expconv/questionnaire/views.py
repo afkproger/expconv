@@ -103,7 +103,7 @@ class ShowUserInfo(generics.RetrieveAPIView):
         return self.request.user
 
 
-class CalculateConvolution(APIView):
+class FindConvolution(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -126,10 +126,3 @@ class CalculateConvolution(APIView):
 
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
-
-    # survey_results = {0: 0.2, 1: 0.6, 2: 0.4}
-    # calculate = EffectivenessCalculator(survey_results)
-    # parameters_list = calculate.get_parameters_list()
-    # fn_labels = calculate.get_fn_labels()
-    # print(f"jрез = {EffectivenessCalculator.form_polynomial(parameters_list, fn_labels)}")
-    # calculate_effectiveness(parameters_list)

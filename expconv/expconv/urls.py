@@ -22,9 +22,9 @@ from rest_framework import routers
 router = routers.SimpleRouter()
 router.register(f'tasks', TaskDetailViewSet, basename='tasks')
 router.register(f'questionnaire', TaskQuestionnaireViewSet, basename='questionnaire')
-
+# calculateconv/
 urlpatterns = [
-    path('api/v1/calculateconv/', CalculateConvolution.as_view()),
+    path('api/v1/convolution/', FindConvolution.as_view()),
     path('api/v1/userinfo', ShowUserInfo.as_view()),
     path('api/v1/', include(router.urls)),
     path('api/v1/auth/', include('djoser.urls')),

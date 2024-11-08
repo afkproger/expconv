@@ -4,7 +4,7 @@ import Register from '../components/Register.vue';
 import Tasks from '@/components/Tasks.vue';
 import TaskSettings from '@/components/TaskSettings.vue';
 import Questionnaire from '@/components/Questionnaire.vue'; // Импортируйте компонент опроса
-
+import UserConvolution from '@/components/UserConvolution.vue';
 const routes = [
   {
     path: '/',
@@ -30,6 +30,11 @@ const routes = [
     path: '/questionnaire/:id', // Убедитесь, что здесь правильный путь
     name: 'Questionnaire',
     component: Questionnaire
+  },
+  {
+    path:'/convolution/:id',
+    name: "UserConvolution",
+    component: UserConvolution
   }
 ];
 

@@ -122,21 +122,23 @@ class FindConvolution(APIView):
             fn_labels = calculate.get_fn_labels()
             str_result = f"jрез = {EffectivenessCalculator.form_polynomial(parameters_list, fn_labels)}"
 
-            return Response({'conv': str_result , 'list': parameters_list})
+            return Response({'conv': str_result, 'list': parameters_list})
 
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
-#TODO: Необходимо добавить описание на фронте
+
+# TODO: Необходимо добавить описание на фронте
 class CalculateConvolution(APIView):
     permission_classes = [IsAuthenticated]
-    def post(self , request):
 
+    def post(self, request):
         parameters_list = request.data.get('parameters_list')
         users_choices = request.data.get('users_choices')
         try:
             if (parameters_list is not None) and (users_choices is not None):
-                return Response({'response': EffectivenessCalculator.calculate_polynomial(parameters_list, users_choices)})
+                answers = [float(x) for x in users_choices]
+                return Response(
+                    {'calculate_conv': EffectivenessCalculator.calculate_polynomial(parameters_list, answers)})
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
-

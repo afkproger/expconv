@@ -49,11 +49,9 @@
         </div>
   
         <!-- Отображение результата после отправки ответов -->
-        <div v-if="result">
-        <h3>Результат:</h3>
-        <p>{{ result }}</p>
-        <p>{{ list }}</p>
-        <p>{{ questionnaireData.indicators.length }}</p>
+        <div v-if="result" class="result-container" >
+        <h3 class="result-title" >Результат:</h3>
+        <p class="result-text" >{{ result }}</p>
         </div>
         </div>
 
@@ -74,11 +72,12 @@
         </table>
         <button @click="calculateConvolution" class="button-style">Рассчитать значение свёртки</button>
 
-        <p>{{ user_responses }}</p>
+        <p class="result-title" >Значение свёртки при данных значениях показателей</p>
+        <p class="result-text"> {{convolutionResult }}</p>
+        
       </div>
       
   </template>
-  
   
   <script>
   export default {
@@ -93,11 +92,12 @@
         user_responses: [],
         showUserModal: false,
         responses: [],
+        convolutionResult: null,
         answersJson: null,
         result: null,
         list:null,
         userInfo: {},
-        username: '' // Добавьте переменную username для отображения имени пользователя
+        username: '' 
       };
     },
     async created() {
@@ -124,6 +124,32 @@
           }
         } catch (error) {
           console.error('Ошибка отправки запроса:', error);
+        }
+      },
+      async calculateConvolution() {
+        try {
+          const response = await fetch('http://127.0.0.1:8000/api/v1/calculateconv/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Token ${localStorage.getItem('auth_token')}`
+            },
+            body: JSON.stringify({
+              parameters_list: this.list,
+              users_choices: this.user_responses
+          })
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            this.convolutionResult = data.calculate_conv;
+          } else {
+            console.error('Ошибка при отправке ответов:', response.statusText);
+            this.result = 'Ошибка при отправке ответов';
+          }
+        } catch (error) {
+          console.error('Ошибка отправки запроса:', error);
+          this.result = 'Ошибка при отправке ответов';
         }
       },
       async submitAnswers() {
@@ -259,6 +285,28 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .result-container {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #e8f5e9;
+  text-align: center;
+}
+
+.result-title {
+    color: #2e7d32;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+.result-text {
+    color: #333;
+    font-size: 18px;
+    font-weight: normal;
   }
   
   .answer-option {

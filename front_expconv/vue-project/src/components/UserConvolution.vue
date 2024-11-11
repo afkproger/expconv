@@ -50,10 +50,33 @@
   
         <!-- Отображение результата после отправки ответов -->
         <div v-if="result">
-          <h3>Результат:</h3>
-          <p>{{ result }}</p>
+        <h3>Результат:</h3>
+        <p>{{ result }}</p>
+        <p>{{ list }}</p>
+        <p>{{ questionnaireData.indicators.length }}</p>
         </div>
+        </div>
+
+        <div v-if="result && questionnaireData && questionnaireData.indicators && questionnaireData.indicators.length > 0" class="table-container">
+        <h3>Ввод значений показателей</h3>
+        <table class="questionnaire-table">
+          <tr v-for="(indicator, index) in questionnaireData.indicators" :key="index">
+            <td class="question-cell">J{{ index + 1 }}: {{ indicator.indicator }}</td>
+            <td>
+              <input 
+                type="text"
+                v-model="user_responses[index]"   
+                class="response-input" 
+                placeholder="Введите ответ" 
+              />
+            </td>
+          </tr>
+        </table>
+        <button @click="calculateConvolution" class="button-style">Рассчитать значение свёртки</button>
+
+        <p>{{ user_responses }}</p>
       </div>
+      
   </template>
   
   
@@ -67,10 +90,12 @@
           scale: [],
           indicators: []
         },
+        user_responses: [],
         showUserModal: false,
         responses: [],
         answersJson: null,
         result: null,
+        list:null,
         userInfo: {},
         username: '' // Добавьте переменную username для отображения имени пользователя
       };
@@ -118,6 +143,7 @@
           if (response.ok) {
             const data = await response.json();
             this.result = data.conv; // Сохраняем результат
+            this.list = data.list;
           } else {
             console.error('Ошибка при отправке ответов:', response.statusText);
             this.result = 'Ошибка при отправке ответов';
@@ -331,6 +357,47 @@
   .logout-button:hover {
     background-color: darkred;
   }
+
+  .table-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.questionnaire-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.questionnaire-table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.questionnaire-table tr:last-child {
+  border-bottom: none;
+}
+
+.question-cell {
+  padding: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.response-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+
+.response-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0px 0px 5px rgba(76, 175, 80, 0.5);
+}
   
   </style>
   

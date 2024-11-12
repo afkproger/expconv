@@ -44,7 +44,7 @@
           </ul>
         </div>
         <div class="buttons-container">
-          <button @click="goToTasks" class="button-style">Список задач</button>
+          <button @click="goToTasks" class="button-style">К списку задач</button>
           <button @click="submitAnswers" class="button-style">Отправить ответы</button>
         </div>
   
@@ -62,10 +62,10 @@
             <td class="question-cell">J{{ index + 1 }}: {{ indicator.indicator }}</td>
             <td>
               <input 
-                type="text"
+                type="double"
                 v-model="user_responses[index]"   
                 class="response-input" 
-                placeholder="Введите ответ" 
+                placeholder="Введите предварительно отнормированные значения показателя" 
               />
             </td>
           </tr>
@@ -73,7 +73,7 @@
         <button @click="calculateConvolution" class="button-style">Рассчитать значение свёртки</button>
 
         <p class="result-title" >Значение свёртки при данных значениях показателей</p>
-        <p class="result-text"> {{convolutionResult }}</p>
+        <p class="result-text"> Jрез - {{convolutionResult }}</p>
         
       </div>
       

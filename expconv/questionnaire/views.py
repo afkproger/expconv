@@ -139,6 +139,6 @@ class CalculateConvolution(APIView):
             if (parameters_list is not None) and (users_choices is not None):
                 answers = [float(x) for x in users_choices]
                 return Response(
-                    {'calculate_conv': EffectivenessCalculator.calculate_polynomial(parameters_list, answers)})
+                    {'calculate_conv': round(EffectivenessCalculator.calculate_polynomial(parameters_list, answers),4)})
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)

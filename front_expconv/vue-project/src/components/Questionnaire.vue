@@ -8,7 +8,7 @@
     </header>
 
     <div>
-      <h1>Данная область в разработке</h1>
+      <h1>Предпросмотр опросника</h1>
     </div>
 
     <div v-if="showUserModal" class="modal">
@@ -23,6 +23,29 @@
         <button @click="logoutUser" class="logout-button">Выход</button>
       </div>
     </div>
+
+    <div class="questionnaire-container">
+      <h1>{{ questionnaireData.name }}</h1>
+      <h2>{{ questionnaireData.description }}</h2>
+      <div v-if="questionnaireData.indicators && questionnaireData.indicators.length">
+        <ul class="questions-list">
+          <li v-for="(indicator, index) in questionnaireData.indicators" :key="index" class="question-item">
+            <h4>{{ indicator.question }}</h4>
+            <div class="answers-container">
+              <label v-for="(option, i) in questionnaireData.scale" :key="i" class="answer-option">
+                <input
+                  type="radio"
+                  :name="'question-' + index"
+                  :value="option.grade"
+                  v-model="responses[index]"
+                />
+                {{ option.grade }}
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -30,6 +53,13 @@
 export default {
   data() {
     return {
+      questionnaireData: {
+        name: '',
+        description: '',
+        scale: [],
+        indicators: []
+      },
+      responses: [], // Добавлено для v-model
       username: '',
       showUserModal: false,
       userInfo: {}
@@ -38,7 +68,30 @@ export default {
   mounted() {
     this.username = localStorage.getItem('username') || '';
   },
+  async created() {
+    await this.fetchQuestionnaireData();
+  },
   methods: {
+    async fetchQuestionnaireData() {
+      const taskId = this.$route.params.id;
+      try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch(`http://127.0.0.1:8000/api/v1/questionnaire/${taskId}/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          }
+        });
+        if (response.ok) {
+          this.questionnaireData = await response.json();
+        } else {
+          console.error('Ошибка загрузки данных опросника:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Ошибка отправки запроса:', error);
+      }
+    },
     async fetchUserInfo() {
       try {
         const token = localStorage.getItem('auth_token');
@@ -93,39 +146,36 @@ export default {
 </script>
 
 <style scoped>
-
-
-
 header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px;
 }
-  
+
 .username-container {
-    display: inline-block;
-    padding: 10px 15px;
-    background-color: #f5f5f5;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 20px;
-    font-weight: bold;
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 20px;
+  font-weight: bold;
 }
+
 .header-with-logo {
-    display: flex;
-    align-items: center;
-    padding: 10px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
 
 .logo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50px;
-    height: 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
 }
-
 
 .modal {
   position: fixed;
@@ -173,5 +223,26 @@ header {
 
 .logout-button:hover {
   background-color: #d32f2f;
+}
+
+.questions-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.questionnaire-container {
+  flex: 1;
+  padding: 20px;
+}
+
+.answers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.answer-option {
+  display: flex;
+  align-items: center;
 }
 </style>

@@ -87,8 +87,8 @@
 
         <!-- Кнопки для сохранения и перехода на список задач -->
         <div class="button-container">
-          <button type="button" class="tasks-list-button" @click="goToTasks">Список задач</button>
-          <button type="submit" class="submit-button">Сохранить задачу</button>
+          <button type="button" class="tasks-list-button" @click="goToTasks">К списку опросников</button>
+          <button type="submit" class="submit-button">Сохранить настройки опросника</button>
         </div>
       </form>
     </div>

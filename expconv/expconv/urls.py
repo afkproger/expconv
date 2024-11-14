@@ -26,7 +26,8 @@ router.register(f'questionnaire', TaskQuestionnaireViewSet, basename='questionna
 urlpatterns = [
     path('api/v1/calculateconv/', CalculateConvolution.as_view()),
     path('api/v1/convolution/', FindConvolution.as_view()),
-    path('api/v1/userinfo', ShowUserInfo.as_view()),
+    path('api/v1/userinfo/', ShowUserInfo.as_view()),
+    path('api/v1/experts_questionnaire/', ExpertAnswers.as_view()),
     path('api/v1/', include(router.urls)),
     path('api/v1/auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),

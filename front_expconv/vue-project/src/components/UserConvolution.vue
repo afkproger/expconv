@@ -47,7 +47,8 @@
           <button @click="goToTasks" class="button-style">К списку задач</button>
           <button @click="submitAnswers" class="button-style">Отправить ответы</button>
         </div>
-  
+
+        <p>{{answersJson}}</p>
         <!-- Отображение результата после отправки ответов -->
         <div v-if="result" class="result-container" >
         <h3 class="result-title" >Результат:</h3>
@@ -182,7 +183,7 @@
       async fetchUserInfo() {
         try {
           const token = localStorage.getItem('auth_token');
-          const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo', {
+          const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo/', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

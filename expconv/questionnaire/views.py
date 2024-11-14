@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from questionnaire.conv.EffectivenessCalculator_class import EffectivenessCalculator
-from questionnaire.models import Tasks, Indicators
+from questionnaire.models import Tasks, Indicators, ExpertsResponses
 from questionnaire.serializers import *
 
 
@@ -108,6 +108,7 @@ class FindConvolution(APIView):
 
     def post(self, request):
         try:
+            print(request.data.get('answers', []))
             answers = request.data.get('answers', [])
             survey_results = {}
 
@@ -128,7 +129,6 @@ class FindConvolution(APIView):
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: Необходимо добавить описание на фронте
 class CalculateConvolution(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -139,6 +139,27 @@ class CalculateConvolution(APIView):
             if (parameters_list is not None) and (users_choices is not None):
                 answers = [float(x) for x in users_choices]
                 return Response(
-                    {'calculate_conv': round(EffectivenessCalculator.calculate_polynomial(parameters_list, answers),4)})
+                    {'calculate_conv': round(EffectivenessCalculator.calculate_polynomial(parameters_list, answers),
+                                             4)})
+        except Exception as ex:
+            return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# TODO:Метод post работает , осталось придумать как на фронте это красиво обыграть и сделать  добавление ответов)
+class ExpertAnswers(APIView):
+    def post(self, request):
+        try:
+            task_id = request.data.get('task_id')
+            task_ = Tasks.objects.get(id=task_id)
+            expert = ExpertsResponses.objects.create(
+                task=task_,
+                name=request.data.get('name'),
+                opinion_weight=request.data.get('opinion_weight')
+            )
+            return Response({'name': expert.name, 'token': expert.expert_token})
+
+
+        except Tasks.DoesNotExist:
+            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)

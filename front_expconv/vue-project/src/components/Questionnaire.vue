@@ -59,7 +59,7 @@ export default {
         scale: [],
         indicators: []
       },
-      responses: [], // Добавлено для v-model
+      responses: [],
       username: '',
       showUserModal: false,
       userInfo: {}
@@ -69,13 +69,17 @@ export default {
     this.username = localStorage.getItem('username') || '';
   },
   async created() {
-    await this.fetchQuestionnaireData();
+    if (localStorage.getItem('auth_token')) {
+      await this.fetchQuestionnaireData();
+    }
   },
   methods: {
     async fetchQuestionnaireData() {
       const taskId = this.$route.params.id;
       try {
         const token = localStorage.getItem('auth_token');
+        if (!token) throw new Error('Токен не найден');
+        
         const response = await fetch(`http://127.0.0.1:8000/api/v1/questionnaire/${taskId}/`, {
           method: 'GET',
           headers: {
@@ -83,18 +87,22 @@ export default {
             'Authorization': `Token ${token}`
           }
         });
+        
         if (response.ok) {
           this.questionnaireData = await response.json();
         } else {
-          console.error('Ошибка загрузки данных опросника:', response.status, response.statusText);
+          const errorData = await response.json();
+          console.error('Ошибка загрузки данных опросника:', errorData);
         }
       } catch (error) {
-        console.error('Ошибка отправки запроса:', error);
+        console.error('Ошибка отправки запроса:', error.message);
       }
     },
     async fetchUserInfo() {
       try {
         const token = localStorage.getItem('auth_token');
+        if (!token) throw new Error('Токен не найден');
+        
         const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo', {
           method: 'GET',
           headers: {
@@ -107,19 +115,17 @@ export default {
           this.userInfo = await response.json();
           this.showUserModal = true;
         } else {
-          console.error('Ошибка при получении информации о пользователе:', response.statusText);
+          const errorData = await response.json();
+          console.error('Ошибка при получении информации о пользователе:', errorData);
         }
       } catch (error) {
-        console.error('Ошибка при отправке запроса:', error);
+        console.error('Ошибка при отправке запроса:', error.message);
       }
     },
     async logoutUser() {
       try {
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-          console.warn('Токен отсутствует.');
-          return;
-        }
+        if (!token) throw new Error('Токен не найден');
 
         const response = await fetch('http://127.0.0.1:8000/auth/token/logout/', {
           method: 'POST',
@@ -133,12 +139,13 @@ export default {
           localStorage.removeItem('auth_token');
           this.username = '';
           this.showUserModal = false;
-          window.location.href = 'http://localhost:8080/';
+          this.$router.push('/');
         } else {
-          console.error('Ошибка при выходе из системы:', response.statusText);
+          const errorData = await response.json();
+          console.error('Ошибка при выходе из системы:', errorData);
         }
       } catch (error) {
-        console.error('Ошибка при отправке запроса на выход:', error);
+        console.error('Ошибка при отправке запроса на выход:', error.message);
       }
     }
   }

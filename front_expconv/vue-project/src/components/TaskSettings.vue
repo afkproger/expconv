@@ -115,7 +115,7 @@ export default {
     async fetchUserInfo() {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo', {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

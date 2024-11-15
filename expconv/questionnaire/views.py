@@ -145,7 +145,6 @@ class CalculateConvolution(APIView):
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO:Метод post работает , осталось придумать как на фронте это красиво обыграть и сделать  добавление ответов)
 class ExpertAnswers(APIView):
     def post(self, request):
         try:

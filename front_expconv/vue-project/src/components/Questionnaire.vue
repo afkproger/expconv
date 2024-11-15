@@ -46,6 +46,38 @@
         </ul>
       </div>
     </div>
+    <div class="buttons-container" >
+          <button @click="goToTasks" type="button">К списку задач</button>
+    </div>
+    <div>
+      <h2>Настройки для рассылки опроса экспертам</h2>
+      <form @submit.prevent="submitexpertData">
+        <div v-for="(expert, index) in expertData" :key="index" class="expert-container">
+          <div>
+            <label for="expert_name_{{ index }}">Имя эксперта:</label>
+            <input
+              type="text"
+              :id="'expert_name_' + index"
+              v-model="expert.expert_name"
+              placeholder="Введите имя пользователя"
+              required
+            />
+          </div>
+          <div>
+            <label for="opinion_weight_{{ index }}">Вес мнения эксперта:</label>
+            <input
+              type="number"
+              :id="'opinion_weight_' + index"
+              v-model="expert.opinion_weight"
+              required
+            />
+          </div>
+          <button @click="removeExpert(index)" type="button" v-if="expertData.length > 1">Удалить эксперта</button>
+        </div>
+        <button @click="addExpert" type="button">Добавить эксперта</button>
+        <button @click="createExpertData" type="submit">Сохранить выбор экспертов для ответов</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -60,6 +92,12 @@ export default {
         scale: [],
         indicators: []
       },
+      expertData:[
+        {
+        expert_name:'',
+        opinion_weight: 0.0,
+        }
+    ],
       responses: [],
       username: '',
       showUserModal: false,
@@ -75,6 +113,43 @@ export default {
     }
   },
   methods: {
+    goToTasks() {
+        this.$router.push('/tasks');
+    },
+    addExpert(){
+      this.expertData.push({
+        expert_name:'',
+        opinion_weight:0.0
+
+      });
+    },
+    removeExpert(index){
+      if (this.expertData.length > 1) {
+        this.expertData.splice(index, 1);
+      }
+    },
+    async createExpertData(){
+      try{
+        const response = await fetch(`${config.apiBaseUrl}api/v1/experts_questionnaire/`,{
+          method:'POST',
+          headers:{
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: this.expertData.expert_name,
+            opinion_weight: this.expertData.opinion_weight,
+          })
+        });
+        if (response.ok) {
+          alert("Данные сохранены");
+        } else {
+          const errorData = await response.json();
+          console.error('Ошибка отправки данных:', errorData);
+        }
+      }catch(error){
+        console.error('Ошибка отправки запроса:', error.message);
+      }
+    },
     async fetchQuestionnaireData() {
       const taskId = this.$route.params.id;
       try {
@@ -218,6 +293,13 @@ header {
 .close:hover {
   color: darkred;
 }
+.buttons-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+    width: 300px;
+  }
+
 
 .logout-button {
   margin-top: 20px;
@@ -252,5 +334,97 @@ header {
 .answer-option {
   display: flex;
   align-items: center;
+}
+
+
+form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+input[required] {
+  border-color: #7b9ab8;
+}
+
+input[required]:focus {
+  border-color: #7b9ab8;
+  outline: none;
+}
+
+.expert-container {
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button[type="button"]:not(:last-child) {
+  background-color: #003050;
+}
+
+button[type="button"]:not(:last-child):hover {
+  background-color: #7b9ab8;
 }
 </style>

@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import config from '@/config.js';
 export default {
   data() {
     return {
@@ -80,7 +81,7 @@ export default {
         const token = localStorage.getItem('auth_token');
         if (!token) throw new Error('Токен не найден');
         
-        const response = await fetch(`http://127.0.0.1:8000/api/v1/questionnaire/${taskId}/`, {
+        const response = await fetch(`${config.apiBaseUrl}api/v1/questionnaire/${taskId}/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ export default {
         const token = localStorage.getItem('auth_token');
         if (!token) throw new Error('Токен не найден');
         
-        const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo', {
+        const response = await fetch(`${config.apiBaseUrl}api/v1/userinfo`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -127,7 +128,7 @@ export default {
         const token = localStorage.getItem('auth_token');
         if (!token) throw new Error('Токен не найден');
 
-        const response = await fetch('http://127.0.0.1:8000/auth/token/logout/', {
+        const response = await fetch(`${config.apiBaseUrl}auth/token/logout/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

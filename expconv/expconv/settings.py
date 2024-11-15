@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-@!+33u@fjp(-jyg3yah3$^7-_o@30a#l%94ai9ji*dj&b3pqpt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -93,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'expconv',  # Имя вашей базы данных
         'USER': 'postgres',  # Ваш пользователь
-        'PASSWORD': '1234',  # Пароль пользователя
+        'PASSWORD': '12345',  # Пароль пользователя
         'HOST': 'localhost',  # Адрес базы данных (localhost, если база на локальной машине)
         'PORT': '5432',  # Порт для PostgreSQL (по умолчанию 5432)
     }

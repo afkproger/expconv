@@ -96,6 +96,7 @@
 </template>
 
 <script>
+import config from '@/config.js';
 export default {
   data() {
     return {
@@ -115,7 +116,7 @@ export default {
     async fetchUserInfo() {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo/', {
+        const response = await fetch(`${config.apiBaseUrl}api/v1/userinfo/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -156,7 +157,7 @@ export default {
     async submitTask(){
       try{
         const token = localStorage.getItem('auth_token');
-        const respone = await fetch('http://127.0.0.1:8000/api/v1/tasks/createtask/',{
+        const respone = await fetch(`${config.apiBaseUrl}api/v1/tasks/createtask/`,{
           method: 'POST',
           headers:{
             'Content-Type': 'application/json',

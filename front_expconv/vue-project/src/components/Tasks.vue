@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import config from '@/config.js';
 export default {
   data() {
     return {
@@ -101,7 +102,7 @@ export default {
           return;
         }
 
-        const response = await fetch('http://127.0.0.1:8000/api/v1/tasks/', {
+        const response = await fetch(`${config.apiBaseUrl}api/v1/tasks/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -132,7 +133,7 @@ export default {
         return;
       }
 
-      const response = await fetch('http://127.0.0.1:8000/auth/token/logout/', {
+      const response = await fetch(`${config.apiBaseUrl}auth/token/logout/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +162,7 @@ export default {
     async fetchUserInfo() {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo/', {
+        const response = await fetch(`${config.apiBaseUrl}api/v1/userinfo/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -185,7 +186,7 @@ export default {
     async fetchTaskDetails(taskId) {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch(`http://127.0.0.1:8000/api/v1/questionnaire/${taskId}/`, {
+        const response = await fetch(`${config.apiBaseUrl}api/v1/questionnaire/${taskId}/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

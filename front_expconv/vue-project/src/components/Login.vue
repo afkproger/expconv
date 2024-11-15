@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import config from '@/config.js';
 export default {
   data() {
     return {
@@ -34,7 +35,7 @@ export default {
   methods: {
   async loginUser() {
     try {
-      const response = await fetch('http://127.0.0.1:8000/auth/token/login/', {
+      const response = await fetch(`${config.apiBaseUrl}auth/token/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

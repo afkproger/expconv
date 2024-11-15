@@ -81,6 +81,7 @@
   </template>
   
   <script>
+  import config from '@/config.js';
   export default {
     data() {
       return {
@@ -109,7 +110,7 @@
         const taskId = this.$route.params.id;
         try {
           const token = localStorage.getItem('auth_token');
-          const response = await fetch(`http://127.0.0.1:8000/api/v1/questionnaire/${taskId}/`, {
+          const response = await fetch(`${config.apiBaseUrl}api/v1/questionnaire/${taskId}/`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -129,7 +130,7 @@
       },
       async calculateConvolution() {
         try {
-          const response = await fetch('http://127.0.0.1:8000/api/v1/calculateconv/', {
+          const response = await fetch(`${config.apiBaseUrl}api/v1/calculateconv/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -158,7 +159,7 @@
         console.log('Ответы пользователя:', this.answersJson);
   
         try {
-          const response = await fetch('http://127.0.0.1:8000/api/v1/convolution/', {
+          const response = await fetch(`${config.apiBaseUrl}api/v1/convolution/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -183,7 +184,7 @@
       async fetchUserInfo() {
         try {
           const token = localStorage.getItem('auth_token');
-          const response = await fetch('http://127.0.0.1:8000/api/v1/userinfo/', {
+          const response = await fetch(`${config.apiBaseUrl}api/v1/userinfo/`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -209,7 +210,7 @@
             return;
           }
   
-          const response = await fetch('http://127.0.0.1:8000/auth/token/logout/', {
+          const response = await fetch(`${config.apiBaseUrl}auth/token/logout/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -221,7 +222,7 @@
             localStorage.removeItem('auth_token');
             this.username = '';
             this.showUserModal = false;
-            window.location.href = 'http://localhost:8080/';
+            window.location.href = `${config.apiBaseUrl}`;
           } else {
             console.error('Ошибка при выходе из системы:', response.statusText);
           }

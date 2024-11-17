@@ -46,12 +46,14 @@
         </ul>
       </div>
     </div>
-    <div class="buttons-container" >
-          <button @click="goToTasks" type="button">К списку задач</button>
+
+    <div class="buttons-container">
+      <button @click="goToTasks" type="button">К списку задач</button>
     </div>
+
     <div>
       <h2>Настройки для рассылки опроса экспертам</h2>
-      <form @submit.prevent="submitexpertData">
+      <form @submit.prevent="createExpertData">
         <div v-for="(expert, index) in expertData" :key="index" class="expert-container">
           <div>
             <label for="expert_name_{{ index }}">Имя эксперта:</label>
@@ -69,14 +71,35 @@
               type="number"
               :id="'opinion_weight_' + index"
               v-model="expert.opinion_weight"
+              step="0.01"
               required
             />
           </div>
-          <button @click="removeExpert(index)" type="button" v-if="expertData.length > 1">Удалить эксперта</button>
+          <button @click="removeExpert(index)" type="button" v-if="expertData.length > 1">Удалить</button>
         </div>
-        <button @click="addExpert" type="button">Добавить эксперта</button>
-        <button @click="createExpertData" type="submit">Сохранить выбор экспертов для ответов</button>
+        <button @click="addExpert" type="button">Добавить</button>
+        <button type="submit">Сохранить выбор экспертов для ответов</button>
       </form>
+    </div>
+    <table v-if="questionnaireData.experts_responses && questionnaireData.experts_responses.length > 0">
+    <thead>
+      <tr>
+        <th>Имя эксперта</th>
+        <th>Ссылка</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(expert, index) in questionnaireData.experts_responses" :key="index">
+        <td>{{ expert.name }}</td>
+        <td>
+          <span>{{ `${config.apiBaseUrl}answer/?token=${expert.expert_token}` }}</span>
+        </td>
+      </tr>
+    </tbody>
+    </table>
+    <div>
+      <h3>response</h3>
+      <pre>{{questionnaireData}}</pre>
     </div>
   </div>
 </template>
@@ -86,18 +109,20 @@ import config from '@/config.js';
 export default {
   data() {
     return {
+      config,
       questionnaireData: {
         name: '',
         description: '',
         scale: [],
-        indicators: []
+        indicators: [],
+        experts_responses: [],
       },
-      expertData:[
+      expertData: [
         {
-        expert_name:'',
-        opinion_weight: 0.0,
+          expert_name: '',
+          opinion_weight: 0.0
         }
-    ],
+      ],
       responses: [],
       username: '',
       showUserModal: false,
@@ -114,48 +139,50 @@ export default {
   },
   methods: {
     goToTasks() {
-        this.$router.push('/tasks');
+      this.$router.push('/tasks');
     },
-    addExpert(){
+    addExpert() {
       this.expertData.push({
-        expert_name:'',
-        opinion_weight:0.0
-
+        expert_name: '',
+        opinion_weight: 0.0
       });
     },
-    removeExpert(index){
+    removeExpert(index) {
       if (this.expertData.length > 1) {
         this.expertData.splice(index, 1);
       }
     },
-    async createExpertData(){
-      try{
-        const response = await fetch(`${config.apiBaseUrl}api/v1/experts_questionnaire/`,{
-          method:'POST',
-          headers:{
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: this.expertData.expert_name,
-            opinion_weight: this.expertData.opinion_weight,
-          })
-        });
-        if (response.ok) {
-          alert("Данные сохранены");
-        } else {
-          const errorData = await response.json();
-          console.error('Ошибка отправки данных:', errorData);
-        }
-      }catch(error){
-        console.error('Ошибка отправки запроса:', error.message);
+    async createExpertData() {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`${config.apiBaseUrl}api/v1/questionnaire/choice_experts/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({
+          task_id: this.$route.params.id,
+          experts: this.expertData
+        })
+      });
+
+      if (response.ok) {
+        console.error('Отправка данных');
+      } else {
+        const errorData = await response.json();
+        console.error('Ошибка отправки данных:', errorData);
       }
+    } catch (error) {
+      console.error('Ошибка отправки запроса:', error.message);
+    }
     },
     async fetchQuestionnaireData() {
       const taskId = this.$route.params.id;
       try {
         const token = localStorage.getItem('auth_token');
         if (!token) throw new Error('Токен не найден');
-        
+
         const response = await fetch(`${config.apiBaseUrl}api/v1/questionnaire/${taskId}/`, {
           method: 'GET',
           headers: {
@@ -163,7 +190,7 @@ export default {
             'Authorization': `Token ${token}`
           }
         });
-        
+
         if (response.ok) {
           this.questionnaireData = await response.json();
         } else {
@@ -178,7 +205,7 @@ export default {
       try {
         const token = localStorage.getItem('auth_token');
         if (!token) throw new Error('Токен не найден');
-        
+
         const response = await fetch(`${config.apiBaseUrl}api/v1/userinfo`, {
           method: 'GET',
           headers: {
@@ -229,6 +256,31 @@ export default {
 </script>
 
 <style scoped>
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f5f5f5;
+  color: #333;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
 header {
   display: flex;
   align-items: center;

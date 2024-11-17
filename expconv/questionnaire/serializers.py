@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from djoser.serializers import UserSerializer as BaseUserSerializer
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
-from questionnaire.models import Tasks, Indicators, Scale, User
+from questionnaire.models import Tasks, Indicators, Scale, User, ExpertsResponses
 
 
 class UserCreateSerializer(BaseUserCreateSerializer):
@@ -49,3 +49,19 @@ class UserTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'tasks')
+
+
+class ExpertsCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpertsResponses
+        fields = ('name', 'expert_token')
+
+
+class ExpertQuestionnaireSerializer(serializers.ModelSerializer):
+    experts_responses = ExpertsCreateSerializer(many=True, read_only=True)
+    scale = ScaleSerializer(many=True, read_only=True)
+    indicators = IndicatorSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Tasks
+        fields = ('id', 'name', 'description', 'scale', 'indicators', 'experts_responses')

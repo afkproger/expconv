@@ -47,8 +47,6 @@
           <button @click="goToTasks" class="button-style">К списку задач</button>
           <button @click="submitAnswers" class="button-style">Отправить ответы</button>
         </div>
-
-        <p>{{answersJson}}</p>
         <!-- Отображение результата после отправки ответов -->
         <div v-if="result" class="result-container" >
         <h3 class="result-title" >Результат:</h3>

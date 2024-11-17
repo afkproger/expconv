@@ -68,7 +68,7 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
 
 # пролучаем настройки таска для конкретного пользователя
 class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
-    serializer_class = TaskDetailSerializer
+    serializer_class = ExpertQuestionnaireSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -93,6 +93,51 @@ class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
             raise NotFound({'error': 'Задача не найдена'})
 
         return task
+
+    # TODO: Попробовать убрать перезапуск страницы для отображения результатов
+    @action(methods=['post'], detail=False)
+    def choice_experts(self, request):
+        try:
+            # Получаем данные из запроса
+            experts = request.data.get('experts')
+            task_id = request.data.get('task_id')
+
+            if not experts or not isinstance(experts, list):
+                return Response({'error': 'Invalid or missing "experts" data'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not task_id:
+                return Response({'error': 'Missing "task_id"'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Проверяем существование задачи
+            try:
+                task_ = Tasks.objects.get(id=task_id)
+            except Tasks.DoesNotExist:
+                return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Создаем ответы экспертов
+            response = []
+            for expert in experts:
+                name = expert.get('expert_name')
+                weight = expert.get('opinion_weight')
+
+                if not name or weight is None:
+                    return Response(
+                        {'error': 'Each expert must have "expert_name" and "opinion_weight"'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                expert_data = ExpertsResponses.objects.create(
+                    task=task_,
+                    name=name,
+                    opinion_weight=weight
+                )
+                response.append(expert_data)
+
+            # Возвращаем сериализованные данные
+            return Response(ExpertsCreateSerializer(response, many=True).data, status=status.HTTP_201_CREATED)
+
+        except Exception as ex:
+            return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ShowUserInfo(generics.RetrieveAPIView):
@@ -141,24 +186,5 @@ class CalculateConvolution(APIView):
                 return Response(
                     {'calculate_conv': round(EffectivenessCalculator.calculate_polynomial(parameters_list, answers),
                                              4)})
-        except Exception as ex:
-            return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ExpertAnswers(APIView):
-    def post(self, request):
-        try:
-            task_id = request.data.get('task_id')
-            task_ = Tasks.objects.get(id=task_id)
-            expert = ExpertsResponses.objects.create(
-                task=task_,
-                name=request.data.get('name'),
-                opinion_weight=request.data.get('opinion_weight')
-            )
-            return Response({'name': expert.name, 'token': expert.expert_token})
-
-
-        except Tasks.DoesNotExist:
-            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)

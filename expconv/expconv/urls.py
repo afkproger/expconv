@@ -23,7 +23,7 @@ router = routers.SimpleRouter()
 router.register(f'tasks', TaskDetailViewSet, basename='tasks')
 router.register(f'questionnaire', TaskQuestionnaireViewSet, basename='questionnaire')
 urlpatterns = [
-    path('answer/', ExpertAnswerView.as_view()),
+    path('answers/', ExpertAnswerView.as_view()),
     path('api/v1/calculateconv/', CalculateConvolution.as_view()),
     path('api/v1/convolution/', FindConvolution.as_view()),
     path('api/v1/userinfo/', ShowUserInfo.as_view()),

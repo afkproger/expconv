@@ -3,7 +3,8 @@ import Login from '../components/Login.vue';
 import Register from '../components/Register.vue'; 
 import Tasks from '@/components/Tasks.vue';
 import TaskSettings from '@/components/TaskSettings.vue';
-import Questionnaire from '@/components/Questionnaire.vue'; // Импортируйте компонент опроса
+import Questionnaire from '@/components/Questionnaire.vue'; 
+import ExpertsAnswers from '@/components/ExpertsAnswers.vue';
 import UserConvolution from '@/components/UserConvolution.vue';
 const routes = [
   {
@@ -35,6 +36,11 @@ const routes = [
     path:'/convolution/:id',
     name: "UserConvolution",
     component: UserConvolution
+  },
+  {
+    path:'/answers',
+    name:ExpertsAnswers,
+    component:ExpertsAnswers
   }
 ];
 

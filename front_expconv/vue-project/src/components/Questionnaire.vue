@@ -92,7 +92,7 @@
       <tr v-for="(expert, index) in questionnaireData.experts_responses" :key="index">
         <td>{{ expert.name }}</td>
         <td>
-          <span>{{ `${config.apiBaseUrl}answer/?token=${expert.expert_token}&task=${this.$route.params.id}` }}</span>
+          <span>{{ `${expert_questionnaire_URL}answers/?token=${expert.expert_token}&task=${this.$route.params.id}` }}</span>
         </td>
       </tr>
     </tbody>
@@ -109,7 +109,6 @@ import config from '@/config.js';
 export default {
   data() {
     return {
-      config,
       questionnaireData: {
         name: '',
         description: '',
@@ -123,6 +122,7 @@ export default {
           opinion_weight: 0.0
         }
       ],
+      expert_questionnaire_URL : "http://10.1.8.169:8080/",
       responses: [],
       username: '',
       showUserModal: false,

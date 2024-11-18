@@ -92,7 +92,7 @@
       <tr v-for="(expert, index) in questionnaireData.experts_responses" :key="index">
         <td>{{ expert.name }}</td>
         <td>
-          <span>{{ `${config.apiBaseUrl}answer/?token=${expert.expert_token}` }}</span>
+          <span>{{ `${config.apiBaseUrl}answer/?token=${expert.expert_token}&task=${this.$route.params.id}` }}</span>
         </td>
       </tr>
     </tbody>
@@ -168,7 +168,7 @@ export default {
       });
 
       if (response.ok) {
-        console.error('Отправка данных');
+        console.log('Отправка данных');
       } else {
         const errorData = await response.json();
         console.error('Ошибка отправки данных:', errorData);

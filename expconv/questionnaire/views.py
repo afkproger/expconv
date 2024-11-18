@@ -188,3 +188,25 @@ class CalculateConvolution(APIView):
                                              4)})
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ExpertAnswerView(APIView):
+    def get(self, request):
+        task_id = request.query_params.get('task')  
+        if task_id is not None:
+            try:
+                task = self.get_object(task_id)
+                return Response(TaskDetailSerializer(task).data)
+            except Tasks.DoesNotExist:
+                return Response({"error": "Задача не найдена"}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as ex:
+                return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "Параметры token обязательны"}, status=400)
+
+    def get_queryset(self):
+        return Tasks.objects.all()
+
+    def get_object(self, task_id):
+        queryset = self.get_queryset()
+        return queryset.get(id=task_id)

@@ -65,3 +65,9 @@ class ExpertQuestionnaireSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = ('id', 'name', 'description', 'scale', 'indicators', 'experts_responses')
+
+
+class ExpertDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpertsResponses
+        fields = ('name', 'parameters_list', 'str_convolution')

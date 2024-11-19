@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 import uuid
+from django.contrib.postgres.fields import ArrayField
 
 
 class User(AbstractUser):
@@ -44,4 +45,9 @@ class ExpertsResponses(models.Model):
     name = models.CharField(max_length=255)
     opinion_weight = models.FloatField()
     expert_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    answers = models.JSONField(blank=True, null=True)
+    parameters_list = ArrayField(
+        models.FloatField(),
+        blank=True,
+        default=list
+    )
+    str_convolution = models.TextField(blank=True)

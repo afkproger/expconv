@@ -122,7 +122,7 @@ export default {
           opinion_weight: 0.0
         }
       ],
-      expert_questionnaire_URL : "http://10.1.8.169:8080/",
+      expert_questionnaire_URL : "http://192.168.31.42:8080/",
       responses: [],
       username: '',
       showUserModal: false,

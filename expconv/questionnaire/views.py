@@ -200,8 +200,29 @@ class ExpertAnswerView(APIView):
             return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        expert_token = request.query_params.get('token')
+        expert_token_ = request.query_params.get('token')
+        try:
+            task_ = self.get_object()
+            expert = ExpertsResponses.objects.get(task=task_, expert_token=expert_token_)
+            answers = request.data.get('answers', [])
+            survey_results = {}
 
+            for answer in answers:
+                index = answer.get('index')
+                weight = answer.get('weight')
+
+                if index is not None and weight is not None:
+                    survey_results[index] = weight
+            calculate = EffectivenessCalculator(survey_results)
+            parameters_list = calculate.get_parameters_list()
+            fn_labels = calculate.get_fn_labels()
+            str_result = f"jрез = {EffectivenessCalculator.form_polynomial(parameters_list, fn_labels)}"
+            expert.parameters_list = parameters_list
+            expert.str_convolution = str_result
+
+            return Response(ExpertDetailSerializer(expert).data)
+        except Exception as ex:
+            return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
         return Tasks.objects.all()

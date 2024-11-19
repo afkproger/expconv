@@ -68,7 +68,7 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
 
 # пролучаем настройки таска для конкретного пользователя
 class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
-    serializer_class = ExpertQuestionnaireSerializer
+    serializer_class = ExpertQuestionnaireCreateSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -94,7 +94,6 @@ class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
 
         return task
 
-    # TODO: Попробовать убрать перезапуск страницы для отображения результатов
     @action(methods=['post'], detail=False)
     def choice_experts(self, request):
         try:
@@ -138,6 +137,34 @@ class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
 
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ShowExpertsConvolutionsViewSet(viewsets.ModelViewSet):
+    serializer_class = ExpertQuestionnaireDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Возвращаем пустой QuerySet, если pk не указан
+        task_id = self.kwargs.get('pk')
+        if task_id is None:
+            return Tasks.objects.none()  # Пустой QuerySet
+
+        # Если pk указан, возвращаем только задачи текущего пользователя
+        return Tasks.objects.filter(user=self.request.user)
+
+    def get_object(self):
+        # Пытаемся найти задачу по `id`
+        task_id = self.kwargs.get('pk')
+
+        if task_id is None:
+            raise NotFound({'error': 'Не указан id задачи'})
+
+        try:
+            task = self.get_queryset().get(id=task_id)
+        except Tasks.DoesNotExist:
+            raise NotFound({'error': 'Задача не найдена'})
+
+        return task
 
 
 class ShowUserInfo(generics.RetrieveAPIView):
@@ -219,6 +246,8 @@ class ExpertAnswerView(APIView):
             str_result = f"jрез = {EffectivenessCalculator.form_polynomial(parameters_list, fn_labels)}"
             expert.parameters_list = parameters_list
             expert.str_convolution = str_result
+
+            expert.save()
 
             return Response(ExpertDetailSerializer(expert).data)
         except Exception as ex:

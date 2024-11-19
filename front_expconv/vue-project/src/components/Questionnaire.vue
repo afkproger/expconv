@@ -48,7 +48,8 @@
     </div>
 
     <div class="buttons-container">
-      <button @click="goToTasks" type="button">К списку задач</button>
+      <button @click="goToTasks()" type="button">К списку задач</button>
+      <button @click="getExpertsAnswers()" type="button">Посмотреть ответы экспертов</button>
     </div>
 
     <div>
@@ -78,7 +79,7 @@
           <button @click="removeExpert(index)" type="button" v-if="expertData.length > 1">Удалить</button>
         </div>
         <button @click="addExpert" type="button">Добавить</button>
-        <button type="submit">Сохранить выбор экспертов для ответов</button>
+        <button @click="createExpertData()" type="button">Сохранить выбор экспертов для ответов</button>
       </form>
     </div>
     <table v-if="questionnaireData.experts_responses && questionnaireData.experts_responses.length > 0">
@@ -97,11 +98,7 @@
       </tr>
     </tbody>
     </table>
-    <div>
-      <h3>response</h3>
-      <pre>{{questionnaireData}}</pre>
-    </div>
-  </div>
+   </div>
 </template>
 
 <script>
@@ -109,6 +106,13 @@ import config from '@/config.js';
 export default {
   data() {
     return {
+      experts_covolutions:[
+        {
+          name:"",
+          parameters_list:[],
+          str_convolution:""
+        }
+      ],
       questionnaireData: {
         name: '',
         description: '',
@@ -126,6 +130,7 @@ export default {
       responses: [],
       username: '',
       showUserModal: false,
+      showExpertsAnsModal:false,
       userInfo: {}
     };
   },
@@ -138,6 +143,31 @@ export default {
     }
   },
   methods: {
+    async getExpertsAnswers(){
+      const taskId = this.$route.params.id;
+      try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) throw new Error('Токен не найден');
+
+        const response = await fetch(`${config.apiBaseUrl}api/v1/experts_answers/${taskId}/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          }
+        });
+
+        if (response.ok) {
+          this.experts_covolutions = await response.json();
+          console.log(this.experts_covolutions)
+        } else {
+          const errorData = await response.json();
+          console.error('Ошибка загрузки данных опросника:', errorData);
+        }
+      } catch (error) {
+        console.error('Ошибка отправки запроса:', error.message);
+      }
+    },
     goToTasks() {
       this.$router.push('/tasks');
     },
@@ -169,6 +199,7 @@ export default {
 
       if (response.ok) {
         console.log('Отправка данных');
+        window.location.reload(); 
       } else {
         const errorData = await response.json();
         console.error('Ошибка отправки данных:', errorData);

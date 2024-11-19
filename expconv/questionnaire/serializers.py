@@ -57,7 +57,7 @@ class ExpertsCreateSerializer(serializers.ModelSerializer):
         fields = ('name', 'expert_token')
 
 
-class ExpertQuestionnaireSerializer(serializers.ModelSerializer):
+class ExpertQuestionnaireCreateSerializer(serializers.ModelSerializer):
     experts_responses = ExpertsCreateSerializer(many=True, read_only=True)
     scale = ScaleSerializer(many=True, read_only=True)
     indicators = IndicatorSerializer(many=True, read_only=True)
@@ -70,4 +70,12 @@ class ExpertQuestionnaireSerializer(serializers.ModelSerializer):
 class ExpertDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpertsResponses
-        fields = ('name', 'parameters_list', 'str_convolution')
+        fields = ('name', 'opinion_weight', 'parameters_list', 'str_convolution')
+
+
+class ExpertQuestionnaireDetailSerializer(serializers.ModelSerializer):
+    experts_responses = ExpertDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Tasks
+        fields = ('name', 'description', 'experts_responses')

@@ -22,6 +22,7 @@ from rest_framework import routers
 router = routers.SimpleRouter()
 router.register(f'tasks', TaskDetailViewSet, basename='tasks')
 router.register(f'questionnaire', TaskQuestionnaireViewSet, basename='questionnaire')
+router.register(f'experts_answers', ShowExpertsConvolutionsViewSet, basename='experts_answers')
 urlpatterns = [
     path('answers/', ExpertAnswerView.as_view()),
     path('api/v1/calculateconv/', CalculateConvolution.as_view()),

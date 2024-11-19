@@ -27,8 +27,10 @@
         </div>
 
     <div class="buttons-container">
-      <button @click="sendAnswers()" type="button">Отправить ответы</button>
+      <button @click="generateAnswersJson()" type="button">Отправить ответы</button>
     </div>
+
+    <h1 v-if="answersJson">{{ answersJson }}</h1>
 
     </div>
 </template>
@@ -46,7 +48,8 @@ export default{
             }, 
             taskId: "",
             expertToken: "",
-            responses:[]
+            responses:[],
+            answersJson: null
         }
     },
     async created(){
@@ -75,8 +78,42 @@ export default{
         }
         },
         async sendAnswers(){
-            // тут обработать отправку на сервер ) 
-        }
+           this.generateAnswersJson();
+           try{
+            if (!this.taskId && !this.expertToken) throw new Error('Задача не найдена');
+            const response = await fetch(`${config.apiBaseUrl}answers/?token=${this.expertToken}&task=${this.taskId}`,{
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.answersJson)
+            });
+            if(response.ok){
+                console.log("Ответы отправлены");
+            }else{
+                console.error('Ошибка в отправке ответов')
+            }
+           }catch (error){
+            console.error('Ошибка отправки запроса:', error);
+           }
+        },
+        generateAnswersJson() {
+        this.answersJson = {
+          answers: this.questionnaireData.indicators.map((indicator, index) => {
+            const selectedAnswer = this.responses[index];
+            const selectedOption = this.questionnaireData.scale.find(option => option.grade === selectedAnswer);
+            return {
+              indicators: indicator.indicator,
+              ans: selectedAnswer,
+              weight: selectedOption ? selectedOption.weight : null,
+              index: index
+            };
+          })
+        };
+      },
+      showTestDaya(){
+
+      }
     }
 }
 </script>

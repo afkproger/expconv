@@ -153,7 +153,6 @@ class FindConvolution(APIView):
 
     def post(self, request):
         try:
-            print(request.data.get('answers', []))
             answers = request.data.get('answers', [])
             survey_results = {}
 
@@ -192,21 +191,25 @@ class CalculateConvolution(APIView):
 
 class ExpertAnswerView(APIView):
     def get(self, request):
-        task_id = request.query_params.get('task')  
-        if task_id is not None:
-            try:
-                task = self.get_object(task_id)
-                return Response(TaskDetailSerializer(task).data)
-            except Tasks.DoesNotExist:
-                return Response({"error": "Задача не найдена"}, status=status.HTTP_404_NOT_FOUND)
-            except Exception as ex:
-                return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({"error": "Параметры token обязательны"}, status=400)
+        try:
+            task = self.get_object()
+            return Response(TaskDetailSerializer(task).data)
+        except Tasks.DoesNotExist:
+            return Response({"error": "Задача не найдена"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as ex:
+            return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        expert_token = request.query_params.get('token')
+
 
     def get_queryset(self):
         return Tasks.objects.all()
 
-    def get_object(self, task_id):
+    def get_object(self):
         queryset = self.get_queryset()
-        return queryset.get(id=task_id)
+        task_id = self.request.query_params.get('task')
+        try:
+            return queryset.get(id=task_id)
+        except Exception:
+            return Tasks.objects.none()

@@ -71,8 +71,10 @@
         </table>
         <button @click="calculateConvolution" class="button-style">Рассчитать значение свёртки</button>
 
-        <p class="result-title" >Значение свёртки при данных значениях показателей</p>
-        <p class="result-text"> Jрез - {{convolutionResult }}</p>
+        <div v-if="convolutionResult" >
+          <p class="result-title" >Значение свёртки при данных значениях показателей</p>
+          <p v-if="convolutionResult" class="result-text"> Jрез - {{convolutionResult }}</p>
+        </div>
         
       </div>
       

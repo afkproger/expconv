@@ -138,7 +138,7 @@ class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
-
+#В этом view мы получаем только данные опроса экспертов (без настроек тасков)
 class ShowExpertsConvolutionsViewSet(viewsets.ModelViewSet):
     serializer_class = ExpertQuestionnaireDetailSerializer
     permission_classes = [IsAuthenticated]

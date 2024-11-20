@@ -78,4 +78,4 @@ class ExpertQuestionnaireDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tasks
-        fields = ('name', 'description', 'experts_responses')
+        fields = ('experts_responses',)

@@ -30,7 +30,7 @@
     <button @click="sendAnswers()" type="button">Отправить ответы</button>
   </div>
 
-  <h1 v-if="responseStatus">{{ expertData }}</h1>
+  <h1 v-if="responseStatus">Ваши ответы отправлены</h1>
 
   </div>
 </template>

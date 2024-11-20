@@ -49,7 +49,28 @@
 
     <div class="buttons-container">
       <button @click="goToTasks()" type="button">К списку задач</button>
-      <button @click="getExpertsAnswers()" type="button">Посмотреть ответы экспертов</button>
+      <button @click="showExpertsAnswersModal()" type="button">Посмотреть ответы экспертов</button>
+    </div>
+    
+    <div v-if="showExpertsAnsModal" class="modal large-modal">
+      <div class="modal-content">
+        <span @click="showExpertsAnsModal = false" class="close">&times;</span>
+        <h2>Ответы экспертов</h2>
+        <table class="experts-answers-table">
+          <thead>
+            <tr>
+              <th>Имя эксперта</th>
+              <th>Свёртка</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(expert, index) in experts_covolutions" :key="index">
+              <td>{{ expert.name }}</td>
+              <td>{{ expert.str_convolution }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div>
@@ -93,7 +114,7 @@
       <tr v-for="(expert, index) in questionnaireData.experts_responses" :key="index">
         <td>{{ expert.name }}</td>
         <td>
-          <span>{{ `${expert_questionnaire_URL}answers/?token=${expert.expert_token}&task=${this.$route.params.id}` }}</span>
+          <span>{{ `${config.expert_questionnaire_URL}answers/?token=${expert.expert_token}&task=${this.$route.params.id}` }}</span>
         </td>
       </tr>
     </tbody>
@@ -104,14 +125,16 @@
 <script>
 import config from '@/config.js';
 export default {
-  data() {
+data() {
     return {
-      experts_covolutions:[
+      config,
+      experts_covolutions: [
         {
-          name:"",
-          parameters_list:[],
-          str_convolution:""
-        }
+          name: '',
+          parameters_list: [],
+          str_convolution: '',
+          opinion_weight:0.0
+        },
       ],
       questionnaireData: {
         name: '',
@@ -123,15 +146,14 @@ export default {
       expertData: [
         {
           expert_name: '',
-          opinion_weight: 0.0
-        }
+          opinion_weight: 0.0,
+        },
       ],
-      expert_questionnaire_URL : "http://192.168.31.42:8080/",
       responses: [],
       username: '',
       showUserModal: false,
-      showExpertsAnsModal:false,
-      userInfo: {}
+      showExpertsAnsModal: false,
+      userInfo: {},
     };
   },
   mounted() {
@@ -143,7 +165,7 @@ export default {
     }
   },
   methods: {
-    async getExpertsAnswers(){
+    async getExpertsAnswers() {
       const taskId = this.$route.params.id;
       try {
         const token = localStorage.getItem('auth_token');
@@ -153,16 +175,21 @@ export default {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
-          }
+            Authorization: `Token ${token}`,
+          },
         });
 
         if (response.ok) {
-          this.experts_covolutions = await response.json();
-          console.log(this.experts_covolutions)
+          const responseData = await response.json();
+          this.experts_covolutions = responseData.experts_responses.map(expert => ({
+            name: expert.name,
+            parameters_list: expert.parameters_list,
+            str_convolution: expert.str_convolution,
+            opinion_weight: expert.opinion_weight
+          }));
         } else {
           const errorData = await response.json();
-          console.error('Ошибка загрузки данных опросника:', errorData);
+          console.error('Ошибка загрузки данных ответов экспертов:', errorData);
         }
       } catch (error) {
         console.error('Ошибка отправки запроса:', error.message);
@@ -181,6 +208,10 @@ export default {
       if (this.expertData.length > 1) {
         this.expertData.splice(index, 1);
       }
+    },
+    showExpertsAnswersModal() {
+      this.getExpertsAnswers();
+      this.showExpertsAnsModal = true;
     },
     async createExpertData() {
     try {
@@ -318,7 +349,32 @@ header {
   justify-content: flex-end;
   padding: 10px;
 }
+.large-modal {
+  width: 80%;
+  height: 80%;
+  overflow: auto;
+  top: 10%;
+  left: 10%;
+  position: fixed;
+  background-color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
 
+.experts-answers-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.experts-answers-table th,
+.experts-answers-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.experts-answers-table th {
+  background-color: #f4f4f4;
+}
 .username-container {
   display: inline-block;
   padding: 10px 15px;

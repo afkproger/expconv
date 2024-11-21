@@ -15,13 +15,15 @@
 
     <div v-if="tasks.length" class="tasks-list">
       <ul>
-        <li v-for="task in tasks" :key="task.id">
+        <li v-for="(task , index) in tasks" :key="index">
           <h3>{{ task.name }}</h3>
           <p>{{ task.description }}</p>
+          <p>{{task.id}}</p>
           <button @click="fetchTaskDetails(task.id)" class="action-button">Посмотреть настройки задачи</button>
-          <!-- Кнопка для перехода к опросу -->
           <button @click="goToUserConvolution(task.id)" class="action-button">Рассчитать свёртку</button>
           <button @click="goToQuestionnaire(task.id)" class="action-button">Отправить опрос экспертам</button>
+          <h1>{{task.id}} - {{index}}</h1>
+          <button @click="deleteTask(task.id , index)" class="logout-button">Удалить задачу</button>
         </li>
       </ul>
     </div>
@@ -124,7 +126,31 @@ export default {
         console.error('Ошибка при отправке запроса:', error);
       }
     },
+    async deleteTask(taskId , index){
+      try{
+        const token = localStorage.getItem('auth_token');
+        if(!token){
+          console.warn('Token отсутствует');
+          return;
+        }
 
+        const response = await fetch(`${config.apiBaseUrl}api/v1/tasks/${taskId}/delete_task/`,{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          }
+        })
+        if(response.ok){
+          this.tasks.splice(index ,1)
+          console.log('Удаление прошло успешно')
+        }else{
+          console.error('Ошибка при удалении таска')
+        }
+      }catch (error){
+        console.error('Ошибка при отправке запроса:', error);
+      }
+    },
     async logoutUser() {
     try {
       const token = localStorage.getItem('auth_token');

@@ -65,6 +65,15 @@ class TaskDetailViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist:
             return Response({'error': 'Пользователь не найден'}, status=404)
 
+    @action(methods=['post'], detail=True)
+    def delete_task(self, request, pk=None):
+        user_ = request.user
+        try:
+            task = Tasks.objects.filter(user=user_, id=pk).delete()
+            return Response({'delete': True})
+        except Exception as ex:
+            return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # пролучаем настройки таска для конкретного пользователя
 class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
@@ -138,7 +147,8 @@ class TaskQuestionnaireViewSet(viewsets.ModelViewSet):
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
-#В этом view мы получаем только данные опроса экспертов (без настроек тасков)
+
+# В этом view мы получаем только данные опроса экспертов (без настроек тасков)
 class ShowExpertsConvolutionsViewSet(viewsets.ModelViewSet):
     serializer_class = ExpertQuestionnaireDetailSerializer
     permission_classes = [IsAuthenticated]

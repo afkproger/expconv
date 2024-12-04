@@ -18,11 +18,9 @@
         <li v-for="(task , index) in tasks" :key="index">
           <h3>{{ task.name }}</h3>
           <p>{{ task.description }}</p>
-          <p>{{task.id}}</p>
           <button @click="fetchTaskDetails(task.id)" class="action-button">Посмотреть настройки задачи</button>
           <button @click="goToUserConvolution(task.id)" class="action-button">Рассчитать свёртку</button>
           <button @click="goToQuestionnaire(task.id)" class="action-button">Отправить опрос экспертам</button>
-          <h1>{{task.id}} - {{index}}</h1>
           <button @click="deleteTask(task.id , index)" class="logout-button">Удалить задачу</button>
         </li>
       </ul>

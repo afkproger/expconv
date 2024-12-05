@@ -216,8 +216,9 @@ class CalculateConvolution(APIView):
     def post(self, request):
         parameters_list = request.data.get('parameters_list')
         users_choices = request.data.get('users_choices')
+        indicators_count = request.data.get('indicators_count')
         try:
-            if (parameters_list is not None) and (users_choices is not None):
+            if (parameters_list is not None) and (users_choices is not None) and (int(indicators_count) == len(users_choices)):
                 answers = [float(x) for x in users_choices]
                 return Response(
                     {'calculate_conv': round(EffectivenessCalculator.calculate_polynomial(parameters_list, answers),

@@ -7,6 +7,19 @@
       </span>
     </header>
 
+    <div v-if="showUserModal" class="modal">
+      <div class="modal-content">
+        <span @click="showUserModal = false" class="close">&times;</span>
+        <h2>Профиль пользователя</h2>
+        <p><strong>Имя пользователя:</strong> {{ userInfo.username }}</p>
+        <p><strong>Имя:</strong> {{ userInfo.first_name }}</p>
+        <p><strong>Фамилия:</strong> {{ userInfo.last_name }}</p>
+        <p><strong>Телефон:</strong> {{ userInfo.tel }}</p>
+        <p><strong>Email:</strong> {{ userInfo.email }}</p>
+        <button @click="logoutUser" class="logout-button">Выход</button>
+      </div>
+    </div>
+
     <h1>Опросники пользователя</h1>
 
     <button @click="goToTaskSettings" class="settings-button">
@@ -27,19 +40,6 @@
     </div>
     <div v-else>
       <p>Задачи не найдены.</p>
-    </div>
-
-    <div v-if="showUserModal" class="modal">
-      <div class="modal-content">
-        <span @click="showUserModal = false" class="close">&times;</span>
-        <h2>Профиль пользователя</h2>
-        <p><strong>Имя пользователя:</strong> {{ userInfo.username }}</p>
-        <p><strong>Имя:</strong> {{ userInfo.first_name }}</p>
-        <p><strong>Фамилия:</strong> {{ userInfo.last_name }}</p>
-        <p><strong>Телефон:</strong> {{ userInfo.tel }}</p>
-        <p><strong>Email:</strong> {{ userInfo.email }}</p>
-        <button @click="logoutUser" class="logout-button">Выход</button>
-      </div>
     </div>
 
     <div v-if="showTaskModal" class="modal">
@@ -340,6 +340,9 @@ export default {
     padding: 20px;
     border-radius: 8px;
     width: 500px;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
     position: relative;
   }
   

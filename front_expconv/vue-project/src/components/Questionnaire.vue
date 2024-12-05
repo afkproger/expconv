@@ -52,7 +52,7 @@
       <button @click="showExpertsAnswersModal()" type="button">Посмотреть ответы экспертов</button>
     </div>
     
-    <div v-if="showExpertsAnsModal" class="modal large-modal">
+    <div v-if="showExpertsAnsModal" class="modal">
       <div class="modal-content">
         <span @click="showExpertsAnsModal = false" class="close">&times;</span>
         <h2>Ответы экспертов</h2>
@@ -349,16 +349,6 @@ header {
   justify-content: flex-end;
   padding: 10px;
 }
-.large-modal {
-  width: 80%;
-  height: 80%;
-  overflow: auto;
-  top: 10%;
-  left: 10%;
-  position: fixed;
-  background-color: white;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
 
 .experts-answers-table {
   width: 100%;
@@ -400,24 +390,27 @@ header {
 }
 
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 500px;
-  position: relative;
-}
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  }
 
 .close {
   position: absolute;

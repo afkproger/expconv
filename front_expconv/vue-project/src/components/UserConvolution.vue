@@ -47,13 +47,11 @@
           <button @click="goToTasks" class="button-style">К списку задач</button>
           <button @click="submitAnswers" class="button-style">Отправить ответы</button>
         </div>
-        <!-- Отображение результата после отправки ответов -->
         <div v-if="result" class="result-container" >
-        <h3 class="result-title" >Результат:</h3>
-        <p class="result-text" >{{ result }}</p>
+          <h3 class="result-title" >Результат:</h3>
+          <p class="result-text" >{{ result }}</p>
         </div>
         </div>
-
         <div v-if="result && questionnaireData && questionnaireData.indicators && questionnaireData.indicators.length > 0" class="table-container">
         <h3>Ввод значений показателей</h3>
         <table class="questionnaire-table">
@@ -71,9 +69,12 @@
         </table>
         <button @click="calculateConvolution" class="button-style">Рассчитать значение свёртки</button>
 
-        <div v-if="convolutionResult" >
+        <div v-if="isValueCorrect" >
           <p class="result-title" >Значение свёртки при данных значениях показателей</p>
           <p v-if="convolutionResult" class="result-text"> Jрез - {{convolutionResult }}</p>
+        </div>
+        <div v-else class="no-result">
+          <p>Ошибка при вводе значений показателей , проверьте формат данных</p>
         </div>
         
       </div>
@@ -95,6 +96,7 @@
         showUserModal: false,
         responses: [],
         convolutionResult: null,
+        isValueCorrect: false,
         answersJson: null,
         result: null,
         list:null,
@@ -130,7 +132,7 @@
       },
       async calculateConvolution() {
         try {
-          const response = await fetch(`${config.apiBaseUrl}api/v1/calculateconv/`, {
+            const response = await fetch(`${config.apiBaseUrl}api/v1/calculateconv/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -138,20 +140,22 @@
             },
             body: JSON.stringify({
               parameters_list: this.list,
-              users_choices: this.user_responses
+              users_choices: this.user_responses,
+              indicators_count: this.questionnaireData.indicators.length
           })
           });
-  
+ 
           if (response.ok) {
             const data = await response.json();
             this.convolutionResult = data.calculate_conv;
+            this.isValueCorrect = true;
           } else {
             console.error('Ошибка при отправке ответов:', response.statusText);
-            this.result = 'Ошибка при отправке ответов';
+            this.isValueCorrect = false;
           }
         } catch (error) {
           console.error('Ошибка отправки запроса:', error);
-          this.result = 'Ошибка при отправке ответов';
+          this.isValueCorrect = false;
         }
       },
       async submitAnswers() {
@@ -170,15 +174,16 @@
   
           if (response.ok) {
             const data = await response.json();
-            this.result = data.conv; // Сохраняем результат
+            this.result = data.conv;  // Сохраняем результат 
             this.list = data.list;
+            this.isValueCorrect = true;
           } else {
             console.error('Ошибка при отправке ответов:', response.statusText);
-            this.result = 'Ошибка при отправке ответов';
+            this.isValueCorrect = false;
           }
         } catch (error) {
           console.error('Ошибка отправки запроса:', error);
-          this.result = 'Ошибка при отправке ответов';
+          this.isValueCorrect = false;
         }
       },
       async fetchUserInfo() {

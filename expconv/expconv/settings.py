@@ -92,7 +92,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'expconv',  # Имя вашей базы данных
-        'USER': 'postgres',  # Ваш пользователь
+        'USER': 'kolya',  # Ваш пользователь
         'PASSWORD': '12345',  # Пароль пользователя
         'HOST': 'localhost',  # Адрес базы данных (localhost, если база на локальной машине)
         'PORT': '5432',  # Порт для PostgreSQL (по умолчанию 5432)
